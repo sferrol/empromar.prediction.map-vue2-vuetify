@@ -1,0 +1,153 @@
+{
+    "type": "FeatureCollection",
+    "name": "POL [Interior][Arousa]",
+    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+    "features": [
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 1,
+                "name": "Ribeira B", 
+                "description": "A-NORTE", 
+                "zone": "A-NORTE", 
+                "data": {
+                    "forecast": {
+                        "forecastItemHeader": {
+                            "forecastHeader": {
+                                "ria": [],
+                                "pm": {
+                                    "id": 1,
+                                    "from": "doctrine-db",
+                                    "pmClass": "POL",
+                                    "pmKey": "",
+                                    "pmIdIntecmar": 28,
+                                    "stationType": 0,
+                                    "idRia": 5,
+                                    "keyLocation": "L3",
+                                    "zona": "I",
+                                    "subzona": "I.1",
+                                    "poligono": "Ribeira B",
+                                    "longitud": -8.997816,
+                                    "latitud": 42.518962,
+                                    "description": "Aguiño  Castiñeiras",
+                                    "bateas": 50,
+                                    "createdAt": "2021-01-01T12:00:00+00:00",
+                                    "updatedAt": "2022-09-08T16:45:47+00:00"
+                                },
+                                "feedType": {
+                                    "id": null,
+                                    "from": "doctrine-db",
+                                    "feedTypeKey": "ef-feed:dsp-toxa",
+                                    "feedTypeGroup": null,
+                                    "feedTypeName": "ToxA",
+                                    "feedTypeUnit": "mg/AO",
+                                    "description": null
+                                },
+                                "dateRef": "2022-08-01",
+                                "link": "",
+                                "forecastBuckets": [
+                                    {
+                                        "name": "ToxA-Current",
+                                        "value": "130",
+                                        "text": "110 con analíticas",
+                                        "motion": "",
+                                        "icon": "",
+                                        "color": "#E05CFF"
+                                    },
+                                    {
+                                        "name": "ToxA-Forecast",
+                                        "value": "135",
+                                        "text": "27 con analíticas",
+                                        "motion": "Precaución",
+                                        "icon": "fas fa-exclamation-triangle",
+                                        "color": "#E05CFF"
+                                    },
+                                    {
+                                        "name": "ToxA-AD",
+                                        "value": "22",
+                                        "text": "Previsión a 4 días",
+                                        "motion": "Suave",
+                                        "icon": "fas fa-arrow-up",
+                                        "color": "#FF8000"
+                                    },
+                                    {
+                                        "name": "Header",
+                                        "value": "",
+                                        "text": "Ribeira B",
+                                        "motion": "Precaución",
+                                        "icon": "fas fa-exclamation-triangle",
+                                        "color": "#E05CFF"
+                                    },
+                                    {
+                                        "name": "Estado",
+                                        "value": "C",
+                                        "text": "3d",
+                                        "motion": "",
+                                        "icon": "fas fa-ban",
+                                        "color": "#FF0000"
+                                    },
+                                    {
+                                        "name": "Plan",
+                                        "value": "CC",
+                                        "text": "3d",
+                                        "motion": "",
+                                        "icon": "",
+                                        "color": "#CD001E"
+                                    },
+                                    {
+                                        "name": "Analisis",
+                                        "value": "120",
+                                        "text": "0d",
+                                        "motion": "Moderado",
+                                        "icon": "fas fa-exclamation-circle",
+                                        "color": "#00C0FF"
+                                    },
+                                    {
+                                        "name": "ToxA-Afinidad",
+                                        "value": "68",
+                                        "text": "Desde la semana pasada",
+                                        "motion": "Aproximado",
+                                        "icon": "fas fa-arrow-down",
+                                        "color": "#C090FF"
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }, 
+            "geometry": { "type": "Polygon", "coordinates": [ [ [ -9.0053558, 42.5224708 ], [ -9.0013218, 42.5121588 ], [ -8.9848423, 42.5200669 ], [ -8.9953995, 42.5248113 ], [ -8.999176, 42.5231034 ], [ -9.0009785, 42.5243685 ], [ -9.0053558, 42.5224708 ] ] ] } 
+        },
+        { 
+            "type": "Feature", 
+            "properties": { 
+                "id": 2,
+                "name": "Ribeira C", 
+                "description": null, 
+                "data": { "analisis": "blue", "toxa": "blue" } 
+            }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9638996, 42.5580118 ], [ -8.9618397, 42.546694 ], [ -8.955574, 42.5467572 ], [ -8.9533424, 42.5583912 ], [ -8.9638996, 42.5580118 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra H", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9189672, 42.5841488 ], [ -8.9292669, 42.5799461 ], [ -8.9549732, 42.576944 ], [ -8.954587, 42.5671468 ], [ -8.9304686, 42.5700229 ], [ -8.9335155, 42.5741314 ], [ -8.9202118, 42.5778289 ], [ -8.9137316, 42.5836748 ], [ -8.9189672, 42.5841488 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra G", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9141178, 42.5947332 ], [ -8.9162636, 42.5860762 ], [ -8.9104271, 42.5869609 ], [ -8.9092255, 42.5925848 ], [ -8.9141178, 42.5947332 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9292884, 42.6019042 ], [ -8.9202118, 42.5959495 ], [ -8.9183879, 42.5974027 ], [ -8.9279366, 42.6027413 ], [ -8.9292884, 42.6019042 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9273357, 42.6080006 ], [ -8.9127445, 42.6042734 ], [ -8.9027023, 42.6113486 ], [ -8.9055347, 42.6208231 ], [ -8.9273357, 42.6080006 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra C", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9015007, 42.6139069 ], [ -8.8940334, 42.6147912 ], [ -8.8844204, 42.6298857 ], [ -8.9039469, 42.6274228 ], [ -8.9015007, 42.6139069 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra D", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8926172, 42.6105906 ], [ -8.892746, 42.5971341 ], [ -8.8757515, 42.5929324 ], [ -8.8753653, 42.5959021 ], [ -8.8801289, 42.6002932 ], [ -8.8804293, 42.6093272 ], [ -8.8926172, 42.6105906 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra E1", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8355827, 42.6135595 ], [ -8.8521051, 42.6115381 ], [ -8.8548088, 42.6049683 ], [ -8.865087, 42.6017147 ], [ -8.8352823, 42.6056474 ], [ -8.8355827, 42.6135595 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Pobra E2", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8737774, 42.593501 ], [ -8.8353252, 42.5983346 ], [ -8.8353252, 42.605221 ], [ -8.8660526, 42.601225 ], [ -8.8739061, 42.5959968 ], [ -8.8737774, 42.593501 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Villagarcia A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8297462, 42.6149491 ], [ -8.831377, 42.59884 ], [ -8.8044262, 42.6022517 ], [ -8.810606, 42.6172861 ], [ -8.8297462, 42.6149491 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Villagarcia B1", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8321925, 42.5885723 ], [ -8.8465691, 42.5858234 ], [ -8.8476849, 42.5777024 ], [ -8.8356256, 42.5803253 ], [ -8.8321925, 42.5885723 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Villagarcia B2", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8476849, 42.5770388 ], [ -8.8460541, 42.564713 ], [ -8.8401318, 42.5644602 ], [ -8.8307762, 42.5802621 ], [ -8.8223648, 42.5826636 ], [ -8.8163567, 42.5807677 ], [ -8.8024521, 42.5843067 ], [ -8.8067436, 42.5932799 ], [ -8.8314629, 42.5887303 ], [ -8.8350677, 42.5798829 ], [ -8.8476849, 42.5770388 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados A1", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8495731, 42.5850019 ], [ -8.8682842, 42.5808309 ], [ -8.8693142, 42.5714767 ], [ -8.8606453, 42.568569 ], [ -8.8577271, 42.5710343 ], [ -8.8533497, 42.5677473 ], [ -8.8484573, 42.5689483 ], [ -8.8495731, 42.5850019 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados A2", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8487148, 42.5679369 ], [ -8.8533497, 42.5677473 ], [ -8.8536072, 42.5600981 ], [ -8.8484573, 42.5574428 ], [ -8.8487148, 42.5679369 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados E", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8464832, 42.5637648 ], [ -8.8451099, 42.5559887 ], [ -8.8395309, 42.5626269 ], [ -8.8464832, 42.5637648 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.89884, 42.5736258 ], [ -8.8883686, 42.5698965 ], [ -8.8855362, 42.5707182 ], [ -8.8853645, 42.574005 ], [ -8.8759232, 42.5760276 ], [ -8.8736057, 42.5749531 ], [ -8.8713741, 42.5801357 ], [ -8.89884, 42.5736258 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados C (Norte)", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8993549, 42.5729305 ], [ -8.913517, 42.554661 ], [ -8.882618, 42.5567474 ], [ -8.8910294, 42.5638912 ], [ -8.8993549, 42.5729305 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados C (Sur)", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9164352, 42.5527642 ], [ -8.919611, 42.5487175 ], [ -8.9118862, 42.5460617 ], [ -8.9048481, 42.5468205 ], [ -8.8939476, 42.5430263 ], [ -8.8873386, 42.548591 ], [ -8.8790131, 42.550235 ], [ -8.8789272, 42.5553564 ], [ -8.9164352, 42.5527642 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Cambados D", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8401318, 42.5287963 ], [ -8.8604736, 42.5239257 ], [ -8.8604736, 42.5105771 ], [ -8.8406467, 42.5148161 ], [ -8.8401318, 42.5287963 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Grove A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8556671, 42.4955169 ], [ -8.847084, 42.4991241 ], [ -8.8468266, 42.5067175 ], [ -8.8378143, 42.5108934 ], [ -8.8380718, 42.5132344 ], [ -8.8581562, 42.5091851 ], [ -8.8556671, 42.4955169 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Grove C1", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9121438, 42.4924001 ], [ -8.9324212, 42.4831908 ], [ -8.9304685, 42.4797568 ], [ -8.9110708, 42.4814027 ], [ -8.9121438, 42.4924001 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Grove C2", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9136457, 42.5046611 ], [ -8.9340305, 42.4941879 ], [ -8.9357471, 42.4918463 ], [ -8.9325714, 42.4838713 ], [ -8.9124442, 42.4933019 ], [ -8.9136457, 42.5046611 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Grove C3", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9099979, 42.4818141 ], [ -8.898797, 42.4870361 ], [ -8.9012649, 42.490169 ], [ -8.8972091, 42.4968459 ], [ -8.8863094, 42.5025417 ], [ -8.8733482, 42.5052622 ], [ -8.8835621, 42.5073027 ], [ -8.9114571, 42.4925108 ], [ -8.9099979, 42.4818141 ] ] ] } },
+        { "type": "Feature", "properties": { "name": "Grove C4", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9111996, 42.4937766 ], [ -8.8847637, 42.50754 ], [ -8.8989258, 42.5107036 ], [ -8.9124441, 42.5050091 ], [ -8.9111996, 42.4937766 ] ] ] } }
+    ]
+}
