@@ -250,14 +250,14 @@
       // productionZones.value = geoJsonFormat.readFeatures(productionZoneList)
 
       // TODO - Se sustituye por styleFuncFactory
-      const overrideStyleFunction = (feature, style) => {
-        debugger
-        const properties = feature.getProperties()
-        if (properties?.data?.forecast) {
-          style = getForecastStyle(properties?.data?.forecast)
-          feature.setStyle(style)
-        }
-      }
+      // const overrideStyleFunction = (feature, style) => {
+      //   // debugger
+      //   const properties = feature.getProperties()
+      //   if (properties?.data?.forecast) {
+      //     style = getForecastStyle(properties?.data?.forecast)
+      //     feature.setStyle(style)
+      //   }
+      // }
       const styleFuncFactory = () => {
          // cache to allow styles reusing for features with same state
         // let cache = {}

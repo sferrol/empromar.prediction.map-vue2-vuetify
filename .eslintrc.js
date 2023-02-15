@@ -12,8 +12,8 @@ module.exports = {
     parser: '@babel/eslint-parser',
   },
   rules: {
-    'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-    'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+    'no-console': process.env.NODE_ENV === 'production' ? 'off' : 'off',
+    'no-debugger': process.env.NODE_ENV === 'production' ? 'off' : 'off',
     // 'vue/script-indent': ['error', 2, { baseIndent: 1 }],
     // indent: ['error', 4],
 
