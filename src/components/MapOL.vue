@@ -121,6 +121,7 @@
 </template>
 
 <script>
+  // eslint-disable-next-line no-unused-vars
   import { ref, watch, inject, onMounted } from 'vue';
   import axios from 'axios';
 
@@ -130,13 +131,15 @@
 
   // Openlayer modules
   import { GeoJSON } from 'ol/format';
-  import {altKeyOnly, click, pointerMove} from 'ol/events/condition.js';
+  import {pointerMove} from 'ol/events/condition.js';
   // import { Extent } from 'ol/extent';
   // import { selectconditions } from 'vl-selectconditions'
+  // eslint-disable-next-line no-unused-vars
   import {Fill, Stroke, Style} from 'ol/style.js';
   import { getCenter } from 'ol/extent';
 
-  import {createStyle, findPointOnSurface} from 'vuelayers/dist/ol-ext'
+  // Vuelayers
+  import {createStyle} from 'vuelayers/dist/ol-ext'
 
   // GeoJSON File Imports
   import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import productionZones GeoJSON (LonLat)
@@ -181,7 +184,7 @@
       // Geojson:
       //  EPSG:4326 equivale a WGS84 => L.CRS.EPSG4326 (Default) (LNG-LAT)
       //  EPSG 3857 google Earth
-      const productionZoneList = { type: "FeatureCollection", features: zoneListArousa.features }; // Geojson is LonLat coordinates
+      // const productionZoneList = { type: "FeatureCollection", features: zoneListArousa.features }; // Geojson is LonLat coordinates
       const productionZones = ref(zoneListArousa.features)
 
       // Set up x/y box boundary for map
@@ -196,6 +199,7 @@
       // Coordinate conversion:
       //  Normal:   { lat: 42.51994, lng: -8.93902 } => [42.51994, -8.93902]
       //  Reverso:  { lat: 42.51994, lng: -8.93902 } => [-8.93902, 42.51994] Use in EPSG:4326
+      // eslint-disable-next-line no-unused-vars
       const convert2Coordinate = (latLng) => {
         return [latLng.lat, latLng.lng]
       }
@@ -270,6 +274,7 @@
 
           // feature - ol.Feature instance
           // resolution - current view resolution as float
+          // eslint-disable-next-line no-unused-vars
           return (feature, resolution) => {
             const properties = feature.getProperties()
             if (properties?.data?.forecast) {
