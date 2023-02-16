@@ -126,75 +126,75 @@
 
 <script>
 // import { ref } from '@vue/composition-api'
-import { ref, watch } from 'vue';
+  import { ref, watch } from 'vue';
 
-export default {
-  name: 'forecast-component',
-  props: {
-    forecast: {
-      type: Object,
-      default: () => {},
+  export default {
+    name: 'forecast-component',
+    props: {
+      forecast: {
+        type: Object,
+        default: () => {},
+      },
+      minimize: {
+        type: Boolean,
+        default: true,
+      },
     },
-    minimize: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  setup(props) {
-    // debugger
-    const forecastLocal = ref(JSON.parse(JSON.stringify(props.forecast)));
-
-    // props passed to setup function is reactive object (made probably by reactive()), it's properties are getters.
-    // Watching a getter: https://v3.vuejs.org/api/computed-watch-api.html#watching-a-single-source
-    watch(() => props.forecast, () => {
+    setup(props) {
       // debugger
-      forecastLocal.value = JSON.parse(JSON.stringify(props.forecast));
-    });
+      const forecastLocal = ref(JSON.parse(JSON.stringify(props.forecast)));
 
-    // forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets
-    // const header = props.forecast?.forecastItemHeader?.forecastHeader
+      // props passed to setup function is reactive object (made probably by reactive()), it's properties are getters.
+      // Watching a getter: https://v3.vuejs.org/api/computed-watch-api.html#watching-a-single-source
+      watch(() => props.forecast, () => {
+        // debugger
+        forecastLocal.value = JSON.parse(JSON.stringify(props.forecast));
+      });
 
-    // const getBucketToxA = header?.forecastBuckets[0] // Left
-    // const getBucketToxAForecast = header?.forecastBuckets[1] // <!-- Left-->
-    // const getBucketToxAAD = header?.forecastBuckets[2] // <!-- Right-->
-    // const getBucketH = header?.forecastBuckets[3] //
-    // const getBucketEstado = header?.forecastBuckets[4] //
-    // const getBucketPlan = header?.forecastBuckets[5] //
-    // const getBucketAnalisis = header?.forecastBuckets[6] //
-    // const getBucketToxAAfinidad = header?.forecastBuckets[7] //
+      // forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets
+      // const header = props.forecast?.forecastItemHeader?.forecastHeader
 
-    // const fa2mdiTransform = (faIcon) => {
-    //   if (faIcon === 'fas fa-exclamation-triangle')
-    //     return 'mdi-alert'
-    //   return 'mdi-plus'
-    // }
+      // const getBucketToxA = header?.forecastBuckets[0] // Left
+      // const getBucketToxAForecast = header?.forecastBuckets[1] // <!-- Left-->
+      // const getBucketToxAAD = header?.forecastBuckets[2] // <!-- Right-->
+      // const getBucketH = header?.forecastBuckets[3] //
+      // const getBucketEstado = header?.forecastBuckets[4] //
+      // const getBucketPlan = header?.forecastBuckets[5] //
+      // const getBucketAnalisis = header?.forecastBuckets[6] //
+      // const getBucketToxAAfinidad = header?.forecastBuckets[7] //
 
-    const getHeader = (forecast) => forecast?.forecastItemHeader?.forecastHeader;
+      // const fa2mdiTransform = (faIcon) => {
+      //   if (faIcon === 'fas fa-exclamation-triangle')
+      //     return 'mdi-alert'
+      //   return 'mdi-plus'
+      // }
 
-    const getBucketToxA = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[0];
-    const getBucketToxAForecast = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[1];
-    const getBucketToxAAD = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[2];
-    const getBucketH = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[3];
-    const getBucketEstado = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[4];
-    const getBucketPlan = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[5];
-    const getBucketAnalisis = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[6];
-    const getBucketToxAAfinidad = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[7];
+      const getHeader = (forecast) => forecast?.forecastItemHeader?.forecastHeader;
 
-    return {
-      forecastLocal,
+      const getBucketToxA = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[0];
+      const getBucketToxAForecast = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[1];
+      const getBucketToxAAD = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[2];
+      const getBucketH = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[3];
+      const getBucketEstado = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[4];
+      const getBucketPlan = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[5];
+      const getBucketAnalisis = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[6];
+      const getBucketToxAAfinidad = (forecast) => forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets[7];
 
-      getHeader,
-      getBucketToxA,
-      getBucketToxAForecast,
-      getBucketToxAAD,
-      getBucketH,
-      getBucketEstado,
-      getBucketPlan,
-      getBucketAnalisis,
-      getBucketToxAAfinidad,
-    };
-  },
-};
+      return {
+        forecastLocal,
+
+        getHeader,
+        getBucketToxA,
+        getBucketToxAForecast,
+        getBucketToxAAD,
+        getBucketH,
+        getBucketEstado,
+        getBucketPlan,
+        getBucketAnalisis,
+        getBucketToxAAfinidad,
+      };
+    },
+  };
 </script>
   <style>
 

@@ -7,17 +7,17 @@
 </template>
 
 <script>
-import HomeVuetify from './view/HomeVuetify.vue';
+  import HomeVuetify from './view/HomeVuetify.vue';
 
-export default {
-  name: 'App',
+  export default {
+    name: 'App',
 
-  components: {
-    HomeVuetify,
-  },
+    components: {
+      HomeVuetify,
+    },
 
-  data: () => ({
+    data: () => ({
     //
-  }),
-};
+    }),
+  };
 </script>

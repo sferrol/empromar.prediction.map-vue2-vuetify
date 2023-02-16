@@ -2,9 +2,121 @@
 
   <div id="custom-map-wrapper">
 
-    <div class="overlay-loading">
-      <v-progress-circular color="white" indeterminate :size="35" v-if="loading"></v-progress-circular>
+    <!-- Toxin type -->
+    <div >
+      <v-speed-dial
+        :style="{'z-index': 3}"
+        v-model="isToxinTypeOpen"
+        absolute
+        right
+        top
+        direction="bottom"
+        open-on-hover
+        transition="slide-y-reverse-transition"
+      >
+        <template v-slot:activator>
+          <!-- <v-progress-circular color="white" indeterminate :size="35" v-if="loading"></v-progress-circular> -->
+          <!-- color="blue darken-2" -->
+          <v-btn
+            v-model="isToxinTypeOpen"
+            dark
+            fab
+            :loading="loading"
+            :color="toxinTypeSelected.color || 'blue darken-2'"
+          >
+            <!-- <v-icon v-if="fab">
+              mdi-close
+            </v-icon>
+            <v-icon v-else>
+              mdi-account-circle
+            </v-icon> -->
+            {{ toxinTypeSelected ? toxinTypeSelected.value : '??' }}
+          </v-btn>
+        </template>
+        <v-btn
+          v-for="(item, index) in toxinTypeOptions"
+          :key="index"
+          v-show="item.value !== toxinTypeSelected.value"
+          fab
+          small
+          :color="item.color"
+          @click="toxinTypeSelected = item"
+        >
+          {{ item.text }}
+        </v-btn>
+      </v-speed-dial>
     </div>
+
+    <!-- Date: Prev + Date + Next [Mismo estilo que el toolbar]-->
+    <div style="
+          background: none;
+          position: absolute;
+          top: 0;
+          right: 80px;
+          z-index: 2;
+          padding: 10px;
+    ">
+      <div class="d-flex align-center" style="height: 56px;">
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              color="primary"
+              fab
+              small
+              @click="setDatePrev()"
+            >
+              <v-icon size="24">mdi-chevron-left</v-icon>
+            </v-btn>
+          </template>
+          <span>Anterior</span>
+        </v-tooltip>
+
+        <!-- v-model="modal" -->
+        <v-dialog
+          ref="dialog"
+          :return-value.sync="dateRef"
+          width="290px"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              class="mx-1"
+              color="primary"
+              x-lange
+            >
+              {{ dateRefFormatted }}
+            </v-btn>
+          </template>
+          <v-date-picker
+            v-model="dateRef"
+            scrollable
+            @input="$refs.dialog.save(dateRef)"
+          />
+        </v-dialog>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              color="primary"
+              fab
+              small
+              @click="setDateNext()"
+            >
+              <v-icon size="24">mdi-chevron-right</v-icon>
+            </v-btn>
+          </template>
+          <span>Siguiente</span>
+        </v-tooltip>
+      </div>
+    </div>
+
+    <!-- <div class="overlay-loading">
+      <v-progress-circular color="white" indeterminate :size="35" v-if="loading"></v-progress-circular>
+    </div> -->
 
     <!-- :style="{ height: xs ? '100%' : 'unset' }"> -->
     <div
@@ -122,7 +234,7 @@
 
 <script>
   // eslint-disable-next-line no-unused-vars
-  import { ref, watch, inject, onMounted } from 'vue';
+  import { ref, watch, inject, onMounted, computed } from 'vue';
   import axios from 'axios';
 
   // import L from 'leaflet';  // Import native leaflet
@@ -151,6 +263,10 @@
   // Components
   import ForecastCard from './ForecastCardV.vue'
 
+  // DateRef
+  import { format, parseISO, addDays, subDays } from 'date-fns'
+  import { es } from 'date-fns/locale';
+
   // URL connection
   //  8060 -> symfony API
   //  8062 -> @fake-db
@@ -178,6 +294,66 @@
       // const { mobile, xs } = useDisplay()
       const mobile = ref(false)
       const xs = ref(false)
+
+      // ToxinType
+      // const toxinTypeSelected = ref('dsp');
+      const toxinTypeOptions = [
+        { value: 'DSP', text: 'LIPO', color: 'blue', image: ''},
+        { value: 'ASP', text: 'ASP', color: 'orange', image: ''},
+        { value: 'PSP', text: 'PSP', color: 'green', image: ''},
+      ];
+      const toxinTypeSelected = ref(toxinTypeOptions.find(item => item.value === (localStorage.getItem('toxinType') || 'DSP')));
+      const isToxinTypeOpen = ref(false); // Float icons open/close
+      // const changeToxinType = () => {
+      //   isToxinTypeOpen.value = true;
+      // };
+
+      const getLastDateRefUsed = () => {
+        const ls = localStorage.getItem('dateRef')
+        if (ls === 'now') {
+          return format(parseISO(new Date().toISOString()), 'yyyy-MM-dd')
+        }
+        return  localStorage.getItem('dateRef')
+      }
+      const setLastDateRefUsed = (dateRefString) => {
+        if (dateRefString === format(parseISO(new Date().toISOString()), 'yyyy-MM-dd')) {
+          localStorage.setItem('dateRef', 'now')
+        } else {
+          localStorage.setItem('dateRef', dateRefString)
+        }
+      }
+
+      // Fecha de referencia
+      //  dateRef:          String: (2023-02-16)  - Fecha del componente v-datepicker
+      //  dateRefFormatted  String: (Jue 16)      - Fecha de visualización
+      const dateRef = ref( format(parseISO(getLastDateRefUsed() || new Date().toISOString()), 'yyyy-MM-dd') );
+      const dateRefFormatted = computed( () => {
+        return dateRef.value ? format(parseISO(dateRef.value), "EEE d", { locale: es }) : ''
+      })
+      const setDatePrev = () => {
+        if (dateRef.value) {
+          dateRef.value = format(subDays(parseISO(dateRef.value), 1), 'yyyy-MM-dd');
+        }
+      }
+      const setDateNext = () => {
+        if (dateRef.value) {
+          dateRef.value = format(addDays(parseISO(dateRef.value), 1), 'yyyy-MM-dd');
+        }
+      }
+
+      // Actualizar la predicción al cambiar el contexto
+      watch([
+        () => dateRef.value,
+        () => toxinTypeSelected.value
+      ], () => {
+        if (dateRef.value) {
+          setLastDateRefUsed(dateRef.value)
+        }
+        if (toxinTypeSelected.value) {
+          localStorage.setItem('toxinType', toxinTypeSelected.value.value)
+        }
+        onLoadForecast()
+      })
 
 
       // Productions Zones
@@ -258,29 +434,29 @@
         }
       }
       const styleFuncFactory = () => {
-         // cache to allow styles reusing for features with same state
+        // cache to allow styles reusing for features with same state
         // let cache = {}
-         // pre build some shared styles
+        // pre build some shared styles
         //  let blueStroke = new Stroke({color: "blue"})
 
-         const defaultStyle = [
-            createStyle({
-              strokeColor: 'blue',
-              strokeWidth: 3,
-              fillColor: [255, 255, 255, 0.1], // // rgba(255,255,255,0.1)
-            }),
-          ]
+        const defaultStyle = [
+          createStyle({
+            strokeColor: 'blue',
+            strokeWidth: 3,
+            fillColor: [255, 255, 255, 0.1], // // rgba(255,255,255,0.1)
+          }),
+        ]
 
-          // feature - ol.Feature instance
-          // resolution - current view resolution as float
-          // eslint-disable-next-line no-unused-vars
-          return (feature, resolution) => {
-            const properties = feature.getProperties()
-            if (properties?.data?.forecast) {
-              return [getForecastStyle(properties?.data?.forecast)]
-            }
-            return defaultStyle
+        // feature - ol.Feature instance
+        // resolution - current view resolution as float
+        // eslint-disable-next-line no-unused-vars
+        return (feature, resolution) => {
+          const properties = feature.getProperties()
+          if (properties?.data?.forecast) {
+            return [getForecastStyle(properties?.data?.forecast)]
           }
+          return defaultStyle
+        }
       }
 
       /// <<<
@@ -297,7 +473,7 @@
       const onFeatureClick = async (event) => {
         const pixel = event.pixel || [event.layerX, event.layerY]
         var feature = await map.value.forEachFeatureAtPixel(pixel, function(feature) {
-            return feature;
+          return feature;
         })
         if (feature) {
           const properties = feature.getProperties()
@@ -452,11 +628,22 @@
       }
 
       const onLoadForecast = () => {
+        // const url = `${API_BASE}/public/forecast?riaId=5&dateRef=${dateRef.value}$toxinType=${toxinTypeSelected.value}`
+        const params = {
+          riaId: '5',
+          dateRef: dateRef.value || '',
+          toxinType: toxinTypeSelected.value?.value || ''
+        }
+        var queryString = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+        const url = `${API_BASE}/public/forecast?${queryString}`
+
+
         loading.value = true;
         axios
           // .get('http://localhost:8050/public/forecast?pmId=1&dateRef=1-08-2022')
           // .get('http://localhost:8050/public/forecast?riaId=5&dateRef=1-08-2022')
-          .get(`${API_BASE}/public/forecast?riaId=5&dateRef=1-08-2022`)
+          // .get(`${API_BASE}/public/forecast?riaId=5&dateRef=1-08-2022`)
+          .get(url)
           .then(response => {
             if (response?.data?.forecasts) {
               response?.data.forecasts.map((forecast) => {
@@ -514,6 +701,17 @@
         mobile, // Desactivar mousePointer
         xs,
         loading,
+
+        // ToxinType: [DSP, ASP, PSP]
+        toxinTypeSelected,
+        toxinTypeOptions,
+        isToxinTypeOpen,
+
+        // DateRef
+        dateRef,
+        dateRefFormatted, // Computed DateRef with format
+        setDatePrev,
+        setDateNext,
 
         // Map
         map,

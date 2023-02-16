@@ -92,6 +92,7 @@
       </div>
     </div>
     <!-- <ForecastToxinType v-if="isToxinTypeOpen"></ForecastToxinType> -->
+
     <!-------------------------- End of Search Bar -------------------------------->
 
     <!-------------- Main Menu Drawer ---------------->
@@ -186,53 +187,6 @@
       </md-speed-dial-content>
     </md-speed-dial> -->
 
-    <!-- Location button: Botton-right + Open on hover + Hacia arriba -->
-    <!-- <v-speed-dial
-      v-model="fab"
-      :top="false"
-      :bottom="true"
-      :right="true"
-      :left="false"
-      direction="top"
-      :open-on-hover="true"
-      transition="slide-y-reverse-transition"
-    >
-      <template v-slot:activator>
-        <v-btn
-          v-model="fab"
-          color="blue darken-2"
-          dark
-          fab
-        >
-          <v-icon v-if="fab">
-            mdi-close
-          </v-icon>
-          <v-icon v-else>
-            mdi-account-circle
-          </v-icon>
-        </v-btn>
-      </template>
-      <v-btn
-        fab
-        dark
-        small
-        color="green"
-        @click="showNavigation = true"
-      >
-        <v-icon>mdi-pencil</v-icon>
-      </v-btn>
-      <v-btn
-        fab
-        dark
-        small
-        color="indigo"
-        @click="goMapHome"
-      >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-speed-dial> -->
-    <!-- // Location Button -->
-
     <!--- Map Component --->
     <MapComponent ref="map" :baseLayer="baseLayer" />
     <!-- <MapComponent/> -->
@@ -248,113 +202,115 @@
 </template>
 
 <script>
-import { ref, watch } from 'vue';
-import useMap from '@/service/useMap';
-import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import rooms GeoJSON
+  import { ref, watch } from 'vue';
+  import useMap from '@/service/useMap';
+  import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import rooms GeoJSON
 
-// Main component
-import MapComponent from '../components/MapOL.vue'; // Import Map Component
-// import MapComponent from '../components/MapOL2.vue'; // Import Map Component
+  // Main component
+  import MapComponent from '../components/MapOL.vue'; // Import Map Component
+  // import MapComponent from '../components/MapOL2.vue'; // Import Map Component
 
-// Components
-import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component
-import ForecastPlay from '../components/ForecastPlay.vue'; // Import Map Component
-// import ForecastToxinType from '../components/ForecastToxinType.vue'; // Import Map Component
+  // Components
+  import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component
+  import ForecastPlay from '../components/ForecastPlay.vue'; // Import Map Component
+  // import ForecastToxinType from '../components/ForecastToxinType.vue'; // Import Map Component
 
-export default {
-  // Name of component
-  name: 'home-component',
+  export default {
+    // Name of component
+    name: 'home-component',
 
-  // Child components
-  components: {
-    MapComponent,
-    ForecastLeyend,
-    ForecastPlay,
+    // Child components
+    components: {
+      MapComponent,
+      ForecastLeyend,
+      ForecastPlay,
     // ForecastToxinType,
-  },
+    },
 
-  setup() {
-    const showMenu = ref(false)
-    const searchEmpty = ref(false)
+    setup() {
+      const showMenu = ref(false)
+      const searchEmpty = ref(false)
 
-    // Map component
-    const map = ref(null);
-    const goMapHome = () => {
-      map.value.goMapHome(); // La funcion ha sido desarrollada en el componente Map.vue
-    };
-    const goProductionZone = () => {
-      if (!productionZoneFilterLocal.value) {
-        return;
-      }
-      const selected = zoneListArousa.features.find((item) => item?.properties?.name === productionZoneFilterLocal.value);
-      if (selected) {
-        map.value.goProductionZone(selected); // La funcion ha sido desarrollada en el componente Map.vue
-      }
-    };
-
-    // Production Zones filter
-    const productionZoneFilterLocal = ref(null);
-    const productionZoneFilterOptions = ref([]);
-
-    // Initial loal all filters
-    productionZoneFilterOptions.value = zoneListArousa.features.map((item) => item.properties.name);
-    // Listen for changes
-    watch(() => productionZoneFilterLocal.value, () => {
-      goProductionZone();
-    });
-
-    // >>> Base layer selection
-    const { tileLayerOptions } = useMap();
-
-    const baseLayer = ref(localStorage.getItem('map-base-layer') || 'openstreetmap');
-    const baseLayerOptions = ['openstreetmap', 'mapbox', 'google-satellite-only'].map((key) => {
-      const tileLayer = tileLayerOptions.find((element) => element.id === key);
-      return {
-        value: tileLayer?.id || key,
-        text: tileLayer?.id || key,
-        color: 'info',
-        icon: 'mdi-map',
+      // Map component
+      const map = ref(null);
+      const goMapHome = () => {
+        map.value.goMapHome(); // La funcion ha sido desarrollada en el componente Map.vue
       };
-    });
+      const goProductionZone = () => {
+        if (!productionZoneFilterLocal.value) {
+          return;
+        }
+        const selected = zoneListArousa.features.find((item) => item?.properties?.name === productionZoneFilterLocal.value);
+        if (selected) {
+          map.value.goProductionZone(selected); // La funcion ha sido desarrollada en el componente Map.vue
+        }
+      };
 
-    // Guardamos la capa base para la próxima vez que el usuario inicie la app
-    const onBaseLayerChange = (newLayer) => {
-      localStorage.setItem('map-base-layer', newLayer);
-      baseLayer.value = newLayer;
+      // Production Zones filter
+      const productionZoneFilterLocal = ref(null);
+      const productionZoneFilterOptions = ref([]);
+
+      // Initial loal all filters
+      productionZoneFilterOptions.value = zoneListArousa.features.map((item) => item.properties.name);
+      // Listen for changes
+      watch(() => productionZoneFilterLocal.value, () => {
+        goProductionZone();
+      });
+
+      // >>> Base layer selection
+      const { tileLayerOptions } = useMap();
+
+      const baseLayer = ref(localStorage.getItem('map-base-layer') || 'openstreetmap');
+      const baseLayerOptions = ['openstreetmap', 'mapbox', 'google-satellite-only'].map((key) => {
+        const tileLayer = tileLayerOptions.find((element) => element.id === key);
+        return {
+          value: tileLayer?.id || key,
+          text: tileLayer?.id || key,
+          color: 'info',
+          icon: 'mdi-map',
+        };
+      });
+
+      // Guardamos la capa base para la próxima vez que el usuario inicie la app
+      const onBaseLayerChange = (newLayer) => {
+        localStorage.setItem('map-base-layer', newLayer);
+        baseLayer.value = newLayer;
 
       // Send new layer to Map
       // map.value.onBaseLayerChange(newLayer)
-    };
+      };
 
-    const isToxinTypeOpen = ref(false);
-    const changeToxinType = () => {
-      isToxinTypeOpen.value = true;
-    };
+      const toxinType = ref('dsp');
+      const isToxinTypeOpen = ref(false);
+      const changeToxinType = () => {
+        isToxinTypeOpen.value = true;
+      };
 
-    const fab = ref(true);
-    return {
-      showMenu,
-      searchEmpty,
+      const fab = ref(true);
+      return {
+        showMenu,
+        searchEmpty,
 
-      changeToxinType,
-      isToxinTypeOpen,
+        changeToxinType,
+        isToxinTypeOpen,
+        toxinType,
 
-      fab,
-      map,
-      goMapHome,
-      goProductionZone,
+        fab,
+        map,
+        goMapHome,
+        goProductionZone,
 
-      // Search
-      productionZoneFilterLocal,
-      productionZoneFilterOptions,
+        // Search
+        productionZoneFilterLocal,
+        productionZoneFilterOptions,
 
-      // Base layer
-      baseLayer,
-      baseLayerOptions,
-      onBaseLayerChange,
-    };
-  },
-};
+        // Base layer
+        baseLayer,
+        baseLayerOptions,
+        onBaseLayerChange,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
