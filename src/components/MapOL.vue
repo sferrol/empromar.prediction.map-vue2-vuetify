@@ -3,101 +3,17 @@
   <div id="custom-map-wrapper">
 
     <!-- Toxin type -->
-    <div class="toxin-type-wrapper-top">
-
-      <div class="d-flex align-center" style="height: 56px;">
-        <!-- offset-y -->
-        <v-menu
-          transition="scale-transition"
-          origin="center center"
-          v-model="isToxinTypeOpen"
-          open-on-hover
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-on="on"
-              v-bind="attrs"
-              v-model="isToxinTypeOpen"
-              small
-              fab
-              :loading="loading"
-              :color="toxinTypeSelected.color || 'blue darken-2'"
-            >
-              <v-icon v-if="isToxinTypeOpen">
-                mdi-close
-              </v-icon>
-              <span v-else>{{ toxinTypeSelected ? toxinTypeSelected.value : '??' }}</span>
-            </v-btn>
-          </template>
-          <!-- style="box-shadow: none;" -->
-          <div class="d-flex flex-column mt-12">
-            <v-btn
-              class="my-2"
-              v-for="(item, index) in toxinTypeOptions"
-              :key="index"
-              v-show="item.value !== toxinTypeSelected.value"
-              fab
-              small
-              :color="item.color"
-              @click="toxinTypeSelected = item"
-            >
-              {{ item.text }}
-            </v-btn>
-          </div>
-        </v-menu>
-      </div>
+    <div class="toxin-type-wrapper" :class="[ xs ? 'toxin-type-wrapper-bottom' : 'toxin-type-wrapper-top' ]">
+      <!-- v-if="toxinTypeSelected" -->
+      <forecast-toxin-type
+        :toxin-type-selected.sync="toxinTypeSelected"
+        :toxin-type-options="toxinTypeOptions"
+        :loading="loading"
+      />
     </div>
 
-    <!-- <v-progress-circular color="white" indeterminate :size="35" v-if="loading"></v-progress-circular> -->
-    <!-- <div>
-      <v-speed-dial
-        v-model="isToxinTypeOpen"
-        absolute
-        right
-        top
-        small
-        direction="bottom"
-        open-on-hover
-        transition="slide-y-reverse-transition"
-      >
-        <template v-slot:activator>
-          <v-btn
-            v-model="isToxinTypeOpen"
-            dark
-            fab
-            :loading="loading"
-            :color="toxinTypeSelected.color || 'blue darken-2'"
-          >
-            <v-icon v-if="isToxinTypeOpen">
-              mdi-close
-            </v-icon>
-            <span v-else>{{ toxinTypeSelected ? toxinTypeSelected.value : '??' }}</span>
-
-          </v-btn>
-        </template>
-        <v-btn
-          v-for="(item, index) in toxinTypeOptions"
-          :key="index"
-          v-show="item.value !== toxinTypeSelected.value"
-          fab
-          small
-          :color="item.color"
-          @click="toxinTypeSelected = item"
-        >
-          {{ item.text }}
-        </v-btn>
-      </v-speed-dial>
-    </div> -->
-
     <!-- Date: Prev + Date + Next [Mismo estilo que el toolbar]-->
-    <div style="
-          background: none;
-          position: absolute;
-          top: 0;
-          right: 80px;
-          z-index: 2;
-          padding: 10px;
-    ">
+    <div class="data-ref-wrapper" :class="[ xs ? 'data-ref-wrapper-bottom' : 'data-ref-wrapper-top' ]">
       <div class="d-flex align-center" style="height: 56px;">
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -130,7 +46,16 @@
               x-lange
             >
               {{ dateRefFormatted }}
+              <v-progress-linear
+                v-if="loading"
+                style="position: absolute; top: 17px;"
+                color="deep-purple accent-4"
+                indeterminate
+                rounded
+                height="4"
+              ></v-progress-linear>
             </v-btn>
+
           </template>
           <v-date-picker
             v-model="dateRef"
@@ -199,14 +124,14 @@
       :loadTilesWhileInteracting="false"
       style="height: 100%">
 
+      <!-- @zoomChanged="mapZoomUpdate" -->
+      <!-- @centerChanged="mapCenterUpdate" -->
       <vl-view
         ref="view"
-        :center="mapCenter"
-        :rotation="mapRotation"
-        :zoom="mapZoom"
+        :center.sync="mapCenter"
+        :rotation.sync="mapRotation"
+        :zoom.sync="mapZoom"
         :projection="mapProjection"
-        @zoomChanged="mapZoomUpdate"
-        @centerChanged="mapCenterUpdate"
       />
       <!-- Activamos fullscrren control -->
       <!-- <vl-fullscreen-control /> -->
@@ -250,12 +175,12 @@
         </vl-style> -->
       <!-- </vl-interaction-select> -->
 
-      <!-- Visualizamos la predicción al pasar por encima -->
+      <!-- Visualizamos la predicción al pasar por encima: Separamos del cursor para que se vea -->
       <!-- <template v-slot="slotProps"> -->
       <!-- {{selectedPM.name}} - {{slotProps}} -->
       <vl-overlay :position="selectedPMPosition" v-if="selectedPM">
         <div :style="{ 'min-width': '400px' }">
-          <div style="display:block; margin-top:10px; padding:16px">
+          <div style="margin-top: 16px; margin-left: 16px">
             <ForecastCard :forecast="selectedPM.forecast" v-if="selectedPM.forecast"></ForecastCard>
           </div>
         </div>
@@ -303,6 +228,7 @@
 
   // Components
   import ForecastCard from './ForecastCardV.vue'
+  import ForecastToxinType from './ForecastToxinType.vue';
 
   // DateRef
   import { format, parseISO, addDays, subDays } from 'date-fns'
@@ -321,6 +247,7 @@
     name: "map-component",
     components: {
       ForecastCard,
+      ForecastToxinType,
     },
     props: {
       baseLayer: {
@@ -328,29 +255,24 @@
         default: 'openstreetmap',
       },
     },
-    // mounted() {
-    //   console.log('Width: ', this.$vuetify.breakpoint.width)
-    // },
     setup(props) {
       // const { mobile, xs } = useDisplay() // vuetify 3
-      //  $vuetify.breakpoint.xs $vuetify.breakpoint.mobile
+      // $vuetify.breakpoint.xs $vuetify.breakpoint.mobile
       const vuetify = useVuetify();
       const mobile = computed(() => vuetify.breakpoint.mobile);
       const xs = computed(() => vuetify.breakpoint.xs);
 
+
       // ToxinType
-      // const toxinTypeSelected = ref('dsp');
       const toxinTypeOptions = [
         { value: 'DSP', text: 'LIPO', color: 'blue', image: ''},
         { value: 'ASP', text: 'ASP', color: 'orange', image: ''},
         { value: 'PSP', text: 'PSP', color: 'green', image: ''},
       ];
       const toxinTypeSelected = ref(toxinTypeOptions.find(item => item.value === (localStorage.getItem('toxinType') || 'DSP')));
-      const isToxinTypeOpen = ref(false); // Float icons open/close
-      // const changeToxinType = () => {
-      //   isToxinTypeOpen.value = true;
-      // };
 
+
+      /** --- DATEREF --- */
       const getLastDateRefUsed = () => {
         const ls = localStorage.getItem('dateRef')
         if (ls === 'now') {
@@ -383,6 +305,8 @@
           dateRef.value = format(addDays(parseISO(dateRef.value), 1), 'yyyy-MM-dd');
         }
       }
+      /** */
+
 
       // Actualizar la predicción al cambiar el contexto
       watch([
@@ -399,17 +323,58 @@
       })
 
       /* FUNCIONS */
-      const defaultMapCenter = { lat: 42.51994, lng: -8.93902 }
+      const defaultMapCenter = [42.51994, -8.93902] // podría ser un objecto LatLon = { lat: 42.51994, lng: -8.93902 }
       const defaultMapZoom = 12.5
+
       const getUserMapCenter = () => {
-        return localStorage.getItem('map-center') || defaultMapCenter
+        let coord = localStorage.getItem('map-center') // [Lng, Lat]
+        if (coord) {
+          coord = JSON.parse(coord)
+        }
+        return  Array.isArray(coord) ? coord : defaultMapCenter
       }
+      const setUserMapCenter = (center) => {
+        localStorage.setItem('map-center', JSON.stringify(center)) // Set [Lng, Lat]
+      }
+
       const getUserMapZoom = () => {
-        return localStorage.getItem('map-zoom') || defaultMapZoom
+        let zoom = localStorage.getItem('map-zoom') // import number
+        if (zoom) {
+          zoom = JSON.parse(zoom)
+        }
+        return (typeof zoom === 'number') ? zoom : defaultMapZoom
       }
+      const setUserMapZoom = (zoom) => {
+        localStorage.setItem('map-zoom', zoom) // numeric
+      }
+
       const getUserMapRotation = () => {
         return localStorage.getItem('map-rotation') || 0
       }
+
+
+      // Coordinate conversion:
+      //  Normal:   { lat: 42.51994, lng: -8.93902 } => [42.51994, -8.93902]
+      //  Reverso:  { lat: 42.51994, lng: -8.93902 } => [-8.93902, 42.51994] Use in EPSG:4326
+      // eslint-disable-next-line no-unused-vars
+      // const convert2Coordinate = (latLng) => {
+      //   return [latLng.lat, latLng.lng]
+      // }
+      // const convert2CoordinateReverse = (latLng) => {
+      //   return [latLng.lng, latLng.lat]
+      // }
+      // const convert2CoordinateReverse = (latLngArray) => {
+      //   return [latLngArray[1], latLngArray[0]]
+      // }
+      // Set up x/y box boundary for map
+      //  -9.313264264027785, 42.16707798644801, -8.488283058107688, 42.884309902262885
+      //  Left-top: 42.65416193033991, -87.87676334381104
+      //  Right-bottom: 42.637652611643716, -87.8353500366211
+      //  Center: 42.64608415262391, -87.85539794400394
+      // const centerBound = getUserCenter(); // L.latLng(42.51994, -8.93902);
+      // const firstBound = L.latLng(42.16707798644801, -9.313264264027785);
+      // const secondBound = L.latLng(42.884309902262885, -8.488283058107688);
+
 
       // Productions Zones
       // Geojson:
@@ -418,38 +383,14 @@
       // const productionZoneList = { type: "FeatureCollection", features: zoneListArousa.features }; // Geojson is LonLat coordinates
       const productionZones = ref(zoneListArousa.features)
 
-      // Set up x/y box boundary for map
-      //  -9.313264264027785, 42.16707798644801, -8.488283058107688, 42.884309902262885
-      //  Left-top: 42.65416193033991, -87.87676334381104
-      //  Right-bottom: 42.637652611643716, -87.8353500366211
-      //  Center: 42.64608415262391, -87.85539794400394
-      // const centerBound = getUserCenter(); // L.latLng(42.51994, -8.93902);
-      //const firstBound = L.latLng(42.16707798644801, -9.313264264027785);
-      //const secondBound = L.latLng(42.884309902262885, -8.488283058107688);
-
-      // Coordinate conversion:
-      //  Normal:   { lat: 42.51994, lng: -8.93902 } => [42.51994, -8.93902]
-      //  Reverso:  { lat: 42.51994, lng: -8.93902 } => [-8.93902, 42.51994] Use in EPSG:4326
-      // eslint-disable-next-line no-unused-vars
-      const convert2Coordinate = (latLng) => {
-        return [latLng.lat, latLng.lng]
-      }
-      const convert2CoordinateReverse = (latLng) => {
-        return [latLng.lng, latLng.lat]
-      }
-
-
       // Map
       const view = ref(null)
       const map = ref(null)
 
-      const mapProjection = ref('EPSG:4326') // EPSG:3857 - Proyección WGS84 / Pseudo-Mercator
-      const mapCenter = ref(convert2CoordinateReverse(getUserMapCenter()))
+      const mapProjection = ref('EPSG:4326')    // EPSG:3857 - Proyección WGS84 / Pseudo-Mercator (Usa [Lng,Lat])
+      const mapCenter = ref(getUserMapCenter()) // convert2CoordinateReverse() Trabajamos directamente con [Lng,Lat]
       const mapZoom = ref(getUserMapZoom())
       const mapRotation = ref(getUserMapRotation())
-
-      // const currentZoom = ref(mapZoom.value)
-      // const currentCenter = ref(mapCenter.value)
 
 
       // >>> Base layer selection
@@ -488,6 +429,25 @@
           feature.setStyle(style)
         }
       }
+      // TODO - Se puede optimizar con una funcion matemática conociendo el rango
+      // Se puede usar el zoom actual que es un parametro que conocemos mejor
+      // Para la proyeccion EPSG:4326 -> Rango: 0.703125 (mayor) a 0.000001 (menor resolución)
+      const calcStrikeWidth = (resolution) => {
+        if (resolution < 0.0001) {
+          return 4
+        }
+        if (resolution < 0.0002) {
+          return 3
+        }
+        if (resolution < 0.0003) {
+          return 2
+        }
+        if (resolution < 0.0004) {
+          return 1
+        }
+        return 0.5
+      }
+
       const styleFuncFactory = () => {
         // cache to allow styles reusing for features with same state
         // let cache = {}
@@ -504,16 +464,20 @@
 
         // feature - ol.Feature instance
         // resolution - current view resolution as float
+        // 0.00009086444068959228 -> 3
+        // 0.00018341619973591912 -> 2.5
+        // 0.00021139523061532628 -> 2
+        // 0.0002688142287099566  -> 2
+        // 0.00036579971708701025 -> 1
         // eslint-disable-next-line no-unused-vars
         return (feature, resolution) => {
           const properties = feature.getProperties()
           if (properties?.data?.forecast) {
-            return [getForecastStyle(properties?.data?.forecast)]
+            return [getForecastStyle(properties?.data?.forecast, calcStrikeWidth(resolution))]
           }
           return defaultStyle
         }
       }
-
       /// <<<
 
 
@@ -539,7 +503,9 @@
             layerSelectedPoint.value = getCenterCoordinateOfPoligone(feature.getGeometry().getCoordinates())
           }
         } else {
-          showForecast(null)
+          if (forecastMinimize.value) {
+            showForecast(null)
+          }
         }
       }
 
@@ -587,18 +553,14 @@
 
       // zoomUpdate: updates a data property with the current zoom level dynamically
       // also changes the visibility of building or room labels based on zoom level
-      const mapZoomUpdate = (zoom) => {
-        // currentZoom.value = zoom;
-        localStorage.setItem('map-zoom', zoom)
-        console.log(zoom)
-      }
+      // watch(() => mapRotation.value, () => {})
+      watch(() => mapZoom.value, () => {
+        setUserMapZoom(mapZoom.value)
+      })
+      watch(() => mapCenter.value, () => {
+        setUserMapCenter(mapCenter.value)
+      })
 
-      // centerUpdate: updates the currentCenter value with the center if it has changed
-      const mapCenterUpdate = (center) => {
-        // currentCenter.value = center;
-        localStorage.setItem('map-center', center)
-        console.log(center)
-      }
 
       // Go smooth
       //  view.value.setCenter(coordinate)
@@ -720,7 +682,7 @@
       onLoadForecast()
 
       // Forecast
-      const getForecastStyle = (forecast) => {
+      const getForecastStyle = (forecast, strokeWidth = 3) => {
         let toxAForecastColor
         let analisisColor
 
@@ -740,7 +702,7 @@
         });
         const stroke = new Stroke({
           color: analisisColor || '#fff8eb',
-          width: 3,
+          width: strokeWidth || 3,
           opacity: 0.1
         });
 
@@ -765,7 +727,6 @@
         // ToxinType: [DSP, ASP, PSP]
         toxinTypeSelected,
         toxinTypeOptions,
-        isToxinTypeOpen,
 
         // DateRef
         dateRef,
@@ -781,8 +742,8 @@
         mapCenter,
         mapZoom,
         // Map functions
-        mapZoomUpdate,
-        mapCenterUpdate,
+        mapZoomUpdate: setUserMapZoom,
+        mapCenterUpdate: setUserMapCenter,
         goMapHome,
         goProductionZone,
 
@@ -818,21 +779,34 @@
 <!--- Scoped styles only apply to this component --->
 <style lang="scss" scoped>
 
-  .toxin-type-wrapper-top {
+  .toxin-type-wrapper {
     background: none;
     position: absolute;
-    top: 0;
-    right: 10px;
     z-index: 2;
     padding: 10px;
   }
+  .toxin-type-wrapper-top {
+    top: 0;
+    right: 10px;
+  }
   .toxin-type-wrapper-bottom {
-    background: none;
-    position: absolute;
     bottom: 0;
     right: 10px;
-    z-index: 2;
-    padding: 10px;
+  }
+
+  .data-ref-wrapper {
+      background: none;
+      position: absolute;
+      z-index: 2;
+      padding: 10px;
+  }
+  .data-ref-wrapper-top {
+    top: 0;
+    right: 80px;
+  }
+  .data-ref-wrapper-bottom {
+    bottom: 0;
+    left: 10px;
   }
 
   .overlay-loading {

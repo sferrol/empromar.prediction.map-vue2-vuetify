@@ -88,10 +88,8 @@
           </template>
         </v-tooltip>
         <!-- <v-date-picker></v-date-picker> -->
-        <!-- <v-btn icon="mdi-crosshairs-gps" @click="changeToxinType"></v-btn> -->
       </div>
     </div>
-    <!-- <ForecastToxinType v-if="isToxinTypeOpen"></ForecastToxinType> -->
 
     <!-------------------------- End of Search Bar -------------------------------->
 
@@ -120,8 +118,7 @@
         </v-btn>
       </v-toolbar>
 
-      <!-- Lista de opciones -->
-      <!-- Contact status -->
+      <!-- BaseLayers -->
       <div class="mt-4 ml-4">
         <v-radio-group
           v-model="baseLayer"
@@ -213,7 +210,6 @@
   // Components
   import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component
   import ForecastPlay from '../components/ForecastPlay.vue'; // Import Map Component
-  // import ForecastToxinType from '../components/ForecastToxinType.vue'; // Import Map Component
 
   export default {
     // Name of component
@@ -224,7 +220,6 @@
       MapComponent,
       ForecastLeyend,
       ForecastPlay,
-    // ForecastToxinType,
     },
 
     setup() {
@@ -280,22 +275,10 @@
       // map.value.onBaseLayerChange(newLayer)
       };
 
-      const toxinType = ref('dsp');
-      const isToxinTypeOpen = ref(false);
-      const changeToxinType = () => {
-        isToxinTypeOpen.value = true;
-      };
-
-      const fab = ref(true);
       return {
         showMenu,
         searchEmpty,
 
-        changeToxinType,
-        isToxinTypeOpen,
-        toxinType,
-
-        fab,
         map,
         goMapHome,
         goProductionZone,
