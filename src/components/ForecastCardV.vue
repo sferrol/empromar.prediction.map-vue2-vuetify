@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column rounded-0">
+  <div class="d-flex flex-column">
 
     <!-- Imagen -->
     <!-- <img
@@ -7,7 +7,7 @@
       style="width: 100%; height: 100px;"
       src="../assets/default_thumbnail.png" /> -->
 
-    <v-card class="d-flex flex-column w-100">
+    <v-card class="d-flex flex-column w-100 rounded-0">
       <!-- <v-card-header :style="{'background-color': getBucketH(forecast).color}">
           <div class="md-title">{{ forecast.forecastItemHeader.forecastHeader.pm.poligono }}</div>
           <div class="md-title">{{ getBucketH(forecast).text }}</div>
@@ -28,8 +28,9 @@
         </v-btn>
       </v-toolbar>
 
+      <!-- Body -->
       <div class="pa-3">
-        <div style="display: grid; grid-template-columns: 36% 64%;">
+        <div style="display: grid; grid-template-columns: 36% 64%; font-size: 14px;">
           <!-- Bucket Left: Current ToxA -->
           <div class="d-flex flex-column mt-1">
             <span class="text-muted" style="border-bottom: 1px solid grey;">Actual</span>

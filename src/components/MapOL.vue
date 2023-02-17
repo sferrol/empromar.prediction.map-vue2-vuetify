@@ -3,20 +3,64 @@
   <div id="custom-map-wrapper">
 
     <!-- Toxin type -->
-    <div >
+    <div class="toxin-type-wrapper-top">
+
+      <div class="d-flex align-center" style="height: 56px;">
+        <!-- offset-y -->
+        <v-menu
+          transition="scale-transition"
+          origin="center center"
+          v-model="isToxinTypeOpen"
+          open-on-hover
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              v-on="on"
+              v-bind="attrs"
+              v-model="isToxinTypeOpen"
+              small
+              fab
+              :loading="loading"
+              :color="toxinTypeSelected.color || 'blue darken-2'"
+            >
+              <v-icon v-if="isToxinTypeOpen">
+                mdi-close
+              </v-icon>
+              <span v-else>{{ toxinTypeSelected ? toxinTypeSelected.value : '??' }}</span>
+            </v-btn>
+          </template>
+          <!-- style="box-shadow: none;" -->
+          <div class="d-flex flex-column mt-12">
+            <v-btn
+              class="my-2"
+              v-for="(item, index) in toxinTypeOptions"
+              :key="index"
+              v-show="item.value !== toxinTypeSelected.value"
+              fab
+              small
+              :color="item.color"
+              @click="toxinTypeSelected = item"
+            >
+              {{ item.text }}
+            </v-btn>
+          </div>
+        </v-menu>
+      </div>
+    </div>
+
+    <!-- <v-progress-circular color="white" indeterminate :size="35" v-if="loading"></v-progress-circular> -->
+    <!-- <div>
       <v-speed-dial
-        :style="{'z-index': 3}"
         v-model="isToxinTypeOpen"
         absolute
         right
         top
+        small
         direction="bottom"
         open-on-hover
         transition="slide-y-reverse-transition"
       >
         <template v-slot:activator>
-          <!-- <v-progress-circular color="white" indeterminate :size="35" v-if="loading"></v-progress-circular> -->
-          <!-- color="blue darken-2" -->
           <v-btn
             v-model="isToxinTypeOpen"
             dark
@@ -24,13 +68,11 @@
             :loading="loading"
             :color="toxinTypeSelected.color || 'blue darken-2'"
           >
-            <!-- <v-icon v-if="fab">
+            <v-icon v-if="isToxinTypeOpen">
               mdi-close
             </v-icon>
-            <v-icon v-else>
-              mdi-account-circle
-            </v-icon> -->
-            {{ toxinTypeSelected ? toxinTypeSelected.value : '??' }}
+            <span v-else>{{ toxinTypeSelected ? toxinTypeSelected.value : '??' }}</span>
+
           </v-btn>
         </template>
         <v-btn
@@ -45,7 +87,7 @@
           {{ item.text }}
         </v-btn>
       </v-speed-dial>
-    </div>
+    </div> -->
 
     <!-- Date: Prev + Date + Next [Mismo estilo que el toolbar]-->
     <div style="
@@ -236,6 +278,7 @@
   // eslint-disable-next-line no-unused-vars
   import { ref, watch, inject, onMounted, computed } from 'vue';
   import axios from 'axios';
+  import { useVuetify } from '../composables/useVuetify'
 
   // import L from 'leaflet';  // Import native leaflet
   import * as turf from '@turf/turf'; // Import turf for GIS functions
@@ -257,8 +300,6 @@
   import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import productionZones GeoJSON (LonLat)
 
   import useMap from '@/service/useMap';
-  // import { useDisplay } from 'vuetify'
-  // import vuetify from 'vuetify'
 
   // Components
   import ForecastCard from './ForecastCardV.vue'
@@ -291,9 +332,11 @@
     //   console.log('Width: ', this.$vuetify.breakpoint.width)
     // },
     setup(props) {
-      // const { mobile, xs } = useDisplay()
-      const mobile = ref(false)
-      const xs = ref(false)
+      // const { mobile, xs } = useDisplay() // vuetify 3
+      //  $vuetify.breakpoint.xs $vuetify.breakpoint.mobile
+      const vuetify = useVuetify();
+      const mobile = computed(() => vuetify.breakpoint.mobile);
+      const xs = computed(() => vuetify.breakpoint.xs);
 
       // ToxinType
       // const toxinTypeSelected = ref('dsp');
@@ -313,7 +356,7 @@
         if (ls === 'now') {
           return format(parseISO(new Date().toISOString()), 'yyyy-MM-dd')
         }
-        return  localStorage.getItem('dateRef')
+        return localStorage.getItem('dateRef')
       }
       const setLastDateRefUsed = (dateRefString) => {
         if (dateRefString === format(parseISO(new Date().toISOString()), 'yyyy-MM-dd')) {
@@ -355,6 +398,18 @@
         onLoadForecast()
       })
 
+      /* FUNCIONS */
+      const defaultMapCenter = { lat: 42.51994, lng: -8.93902 }
+      const defaultMapZoom = 12.5
+      const getUserMapCenter = () => {
+        return localStorage.getItem('map-center') || defaultMapCenter
+      }
+      const getUserMapZoom = () => {
+        return localStorage.getItem('map-zoom') || defaultMapZoom
+      }
+      const getUserMapRotation = () => {
+        return localStorage.getItem('map-rotation') || 0
+      }
 
       // Productions Zones
       // Geojson:
@@ -368,7 +423,7 @@
       //  Left-top: 42.65416193033991, -87.87676334381104
       //  Right-bottom: 42.637652611643716, -87.8353500366211
       //  Center: 42.64608415262391, -87.85539794400394
-      const centerBound = { lat: 42.51994, lng: -8.93902}; // L.latLng(42.51994, -8.93902);
+      // const centerBound = getUserCenter(); // L.latLng(42.51994, -8.93902);
       //const firstBound = L.latLng(42.16707798644801, -9.313264264027785);
       //const secondBound = L.latLng(42.884309902262885, -8.488283058107688);
 
@@ -389,12 +444,12 @@
       const map = ref(null)
 
       const mapProjection = ref('EPSG:4326') // EPSG:3857 - Proyección WGS84 / Pseudo-Mercator
-      const mapCenter = ref(convert2CoordinateReverse(centerBound))
-      const mapZoom = ref(12.5)
-      const mapRotation = ref(0)
+      const mapCenter = ref(convert2CoordinateReverse(getUserMapCenter()))
+      const mapZoom = ref(getUserMapZoom())
+      const mapRotation = ref(getUserMapRotation())
 
-      const currentZoom = ref(mapZoom.value)
-      const currentCenter = ref(mapCenter.value)
+      // const currentZoom = ref(mapZoom.value)
+      // const currentCenter = ref(mapCenter.value)
 
 
       // >>> Base layer selection
@@ -533,12 +588,16 @@
       // zoomUpdate: updates a data property with the current zoom level dynamically
       // also changes the visibility of building or room labels based on zoom level
       const mapZoomUpdate = (zoom) => {
-        currentZoom.value = zoom;
+        // currentZoom.value = zoom;
+        localStorage.setItem('map-zoom', zoom)
+        console.log(zoom)
       }
 
       // centerUpdate: updates the currentCenter value with the center if it has changed
       const mapCenterUpdate = (center) => {
-        currentCenter.value = center;
+        // currentCenter.value = center;
+        localStorage.setItem('map-center', center)
+        console.log(center)
       }
 
       // Go smooth
@@ -589,7 +648,7 @@
         layerSelectedPoint.value = coordinate
 
         // Pan to the location of the coordinatex
-        currentCenter.value = coordinate
+        // currentCenter.value = coordinate
         goToSpot(coordinate)
       }
 
@@ -700,6 +759,7 @@
       return {
         mobile, // Desactivar mousePointer
         xs,
+        vuetify,
         loading,
 
         // ToxinType: [DSP, ASP, PSP]
@@ -757,6 +817,23 @@
 
 <!--- Scoped styles only apply to this component --->
 <style lang="scss" scoped>
+
+  .toxin-type-wrapper-top {
+    background: none;
+    position: absolute;
+    top: 0;
+    right: 10px;
+    z-index: 2;
+    padding: 10px;
+  }
+  .toxin-type-wrapper-bottom {
+    background: none;
+    position: absolute;
+    bottom: 0;
+    right: 10px;
+    z-index: 2;
+    padding: 10px;
+  }
 
   .overlay-loading {
     height: 100%;

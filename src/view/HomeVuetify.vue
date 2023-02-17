@@ -342,7 +342,7 @@
   #custom-search-wrapper {
     background: white;
     max-width: 400px;
-    width: 400px;
+    // width: 400px;
     height: 56px;
     border-radius: 10px;
     -webkit-box-shadow: 0px 0px 3px 0px rgb(0 0 0 / 25%);
