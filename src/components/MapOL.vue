@@ -142,16 +142,33 @@
       </vl-layer-tile>
 
       <!-- GEOJSON (Zonas de produccion): Indicamos un estilo por defecto y luego sobrescribimos la predicción -->
-      <vl-layer-vector>
-        <!-- <vl-source-vector :features="productionZones" :format="geoJsonFormat" >
+      <vl-layer-vector v-if="showLayerPOL">
+        <!-- <vl-source-vector :features="vectorLayerGeojsonPOL" :format="geoJsonFormat" >
           <vl-style :overrideStyleFunction="overrideStyleFunction">
             <vl-style-stroke color="blue" :width="2"></vl-style-stroke>
             <vl-style-fill color="rgba(255,255,255,0.1)"></vl-style-fill>
           </vl-style>
         </vl-source-vector> -->
-        <vl-source-vector :features="productionZones" >
-          <vl-style-func :factory="styleFuncFactory" />
+        <vl-source-vector :features="vectorLayerGeojsonPOL" >
+          <vl-style-func :factory="styleFuncFactoryPOL" />
         </vl-source-vector>
+      </vl-layer-vector>
+
+      <!-- Geojson PMI -->
+      <vl-layer-vector v-if="showLayerPMI">
+        <vl-source-vector :features="vectorLayerGeojsonPMI" >
+          <vl-style-func :factory="styleFuncFactoryPMI" />
+        </vl-source-vector>
+        <!-- <vl-style-box>
+          <vl-style-circle :radius="10">
+            <vl-style-fill color="#c23b8e"></vl-style-fill>
+            <vl-style-stroke color="black"></vl-style-stroke>
+          </vl-style-circle>
+        </vl-style-box> -->
+        <!-- <vl-style-box>
+          <vl-style-icon src="https://img.icons8.com/ultraviolet/50/000000/place-marker.png" :anchor="[0.5, 1]"></vl-style-icon>
+          <vl-style-text text="Free Space" font="14px monospace"></vl-style-text>
+        </vl-style-box> -->
       </vl-layer-vector>
 
       <!-- Al pasar por envima de la zona de producción -->
@@ -181,7 +198,7 @@
       <vl-overlay :position="selectedPMPosition" v-if="selectedPM">
         <div :style="{ 'min-width': '400px' }">
           <div style="margin-top: 16px; margin-left: 16px">
-            <ForecastCard :forecast="selectedPM.forecast" v-if="selectedPM.forecast"></ForecastCard>
+            <ForecastCard :forecast="selectedPM.forecast" v-show="selectedPM.forecast"></ForecastCard>
           </div>
         </div>
       </vl-overlay>
@@ -190,7 +207,17 @@
       <vl-layer-vector v-if="layerSelectedPoint">
         <vl-source-vector>
           <vl-feature>
-            <vl-geom-point :coordinates="layerSelectedPoint" />
+            <!-- <vl-geom-point :coordinates="layerSelectedPoint" /> -->
+            <vl-geom-circle :coordinates="layerSelectedPoint" :radius="0.001"></vl-geom-circle>
+            <vl-style>
+              <vl-style-stroke color="red" :width="1"></vl-style-stroke>
+              <vl-style-fill color="rgba(255,255,255,0.5)"></vl-style-fill>
+            </vl-style>
+            <!-- <vl-style-box>
+              <vl-style-stroke color="blue"></vl-style-stroke>
+              <vl-style-fill color="rgba(255,255,255, 0.1)"></vl-style-fill>
+              <vl-style-text text="I'm circle"></vl-style-text>
+            </vl-style-box> -->
           </vl-feature>
         </vl-source-vector>
       </vl-layer-vector>
@@ -215,14 +242,18 @@
   // import { Extent } from 'ol/extent';
   // import { selectconditions } from 'vl-selectconditions'
   // eslint-disable-next-line no-unused-vars
-  import {Fill, Stroke, Style} from 'ol/style.js';
+  import {Fill, Stroke, Style, Circle } from 'ol/style.js';
+  // import GeometryCollection from 'ol/geom/GeometryCollection.js';
   import { getCenter } from 'ol/extent';
 
   // Vuelayers
-  import {createStyle} from 'vuelayers/dist/ol-ext'
+  // eslint-disable-next-line no-unused-vars
+  import { createStyle, defaultStyle} from 'vuelayers/dist/ol-ext'
 
   // GeoJSON File Imports
-  import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import productionZones GeoJSON (LonLat)
+  //import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import vectorLayerGeojsonPOL GeoJSON (LonLat)
+  import geojsonDataPOL from '../geojson/POL.json'; // Import vectorLayerGeojsonPOL GeoJSON (LonLat)
+  import geojsonDataPMI from '../geojson/PMI.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
 
   import useMap from '@/service/useMap';
 
@@ -253,6 +284,14 @@
       baseLayer: {
         type: String,
         default: 'openstreetmap',
+      },
+      showLayerPOL: {
+        type: Boolean,
+        default: true,
+      },
+      showLayerPMI: {
+        type: Boolean,
+        default: true,
       },
     },
     setup(props) {
@@ -381,7 +420,8 @@
       //  EPSG:4326 equivale a WGS84 => L.CRS.EPSG4326 (Default) (LNG-LAT)
       //  EPSG 3857 google Earth
       // const productionZoneList = { type: "FeatureCollection", features: zoneListArousa.features }; // Geojson is LonLat coordinates
-      const productionZones = ref(zoneListArousa.features)
+      const vectorLayerGeojsonPOL = ref(geojsonDataPOL.features)
+      const vectorLayerGeojsonPMI = ref(geojsonDataPMI.features)
 
       // Map
       const view = ref(null)
@@ -418,20 +458,25 @@
       // const format = inject('ol-format')
       // const geoJsonFormat = new format.GeoJSON()
       const geoJsonFormat = new GeoJSON()
-      // productionZones.value = (new GeoJSON()).readFeatures(productionZoneList)
-      // productionZones.value = geoJsonFormat.readFeatures(productionZoneList)
+      // vectorLayerGeojsonPOL.value = (new GeoJSON()).readFeatures(productionZoneList)
+      // vectorLayerGeojsonPOL.value = geoJsonFormat.readFeatures(productionZoneList)
 
-      // TODO - Se sustituye por styleFuncFactory
-      const overrideStyleFunction = (feature, style) => {
-        const properties = feature.getProperties()
-        if (properties?.data?.forecast) {
-          style = getForecastStyle(properties?.data?.forecast)
-          feature.setStyle(style)
-        }
-      }
+      // TODO - Se sustituye por styleFuncFactoryPOL
+      // const overrideStyleFunction = (feature, style) => {
+      //   const properties = feature.getProperties()
+      //   if (properties?.data?.forecast) {
+      //     style = getForecastStyle(properties?.data?.forecast)
+      //     feature.setStyle(style)
+      //   }
+      // }
       // TODO - Se puede optimizar con una funcion matemática conociendo el rango
       // Se puede usar el zoom actual que es un parametro que conocemos mejor
       // Para la proyeccion EPSG:4326 -> Rango: 0.703125 (mayor) a 0.000001 (menor resolución)
+      //  0.00009086444068959228 -> 3
+      //  0.00018341619973591912 -> 2.5
+      //  0.00021139523061532628 -> 2
+      //  0.0002688142287099566  -> 2
+      //  0.00036579971708701025 -> 1
       const calcStrikeWidth = (resolution) => {
         if (resolution < 0.0001) {
           return 4
@@ -447,14 +492,19 @@
         }
         return 0.5
       }
+      // eslint-disable-next-line no-unused-vars
+      const calcCircleRadius = (resolution) => {
+        return (resolution * 40000) < 10 ? (resolution * 40000) : 10
+      }
 
-      const styleFuncFactory = () => {
+      // >>> POL
+      const styleFuncFactoryPOL = () => {
         // cache to allow styles reusing for features with same state
         // let cache = {}
         // pre build some shared styles
         //  let blueStroke = new Stroke({color: "blue"})
 
-        const defaultStyle = [
+        const defaultStylePOL = [
           createStyle({
             strokeColor: 'blue',
             strokeWidth: 3,
@@ -464,18 +514,76 @@
 
         // feature - ol.Feature instance
         // resolution - current view resolution as float
-        // 0.00009086444068959228 -> 3
-        // 0.00018341619973591912 -> 2.5
-        // 0.00021139523061532628 -> 2
-        // 0.0002688142287099566  -> 2
-        // 0.00036579971708701025 -> 1
-        // eslint-disable-next-line no-unused-vars
         return (feature, resolution) => {
           const properties = feature.getProperties()
           if (properties?.data?.forecast) {
             return [getForecastStyle(properties?.data?.forecast, calcStrikeWidth(resolution))]
           }
-          return defaultStyle
+          return defaultStylePOL
+        }
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const calculateCircleRadius = (currentResolution, currentZoom) => {
+        // debugger
+        // Obtener la resolución actual del mapa view.value
+        // const currentResolution = map.value.getView().getResolution();
+
+        // Calcular el radio en píxeles en función del nivel de zoom
+        // const zoom = view.value.getZoom();
+        const radiusInPixels = 10 * Math.pow(2, currentZoom);
+
+        // Calcular el radio en unidades de mapa
+        const radiusInMapUnits = radiusInPixels * currentResolution;
+
+        return radiusInMapUnits;
+      }
+      // >>> PMI
+      const styleFuncFactoryPMI = () => {
+        var pointStyle = new Style({
+          image: new Circle({
+            radius: 10,
+            fill: new Fill({
+              color: [255, 255, 255, 0]
+            }),
+            stroke: new Stroke({
+              color: 'yellow',
+              width: 2
+            })
+          })
+        });
+        // debugger
+
+
+        // feature - ol.Feature instance
+        // resolution - current view resolution as float
+        // eslint-disable-next-line no-unused-vars
+        return (feature, resolution) => {
+
+          // const properties = feature.getProperties()
+          // if (properties?.data?.forecast) {
+          //   return [getForecastStyle(properties?.data?.forecast, calcStrikeWidth(resolution))]
+          // }
+          // pointStyle.getImage().setRadius(calculateCircleRadius(resolution, mapZoom.value))
+          pointStyle.getImage().setRadius((0.004 / resolution))
+          pointStyle.getImage().getStroke().setWidth(calcStrikeWidth(resolution))
+          return [pointStyle]
+
+          // Modificamos el radio en función de la resolución
+          // return [
+          //   new Style({
+          //     image: new Circle({
+          //       radius: (0.004 / resolution), // > resolución ==> + paqueño
+          //       fill: new Fill({
+          //         color: [255, 255, 255, 0]
+          //       }),
+          //       stroke: new Stroke({
+          //         color: 'yellow',
+          //         width: 1
+          //       })
+          //     })
+          //   })
+          // ]
         }
       }
       /// <<<
@@ -526,6 +634,7 @@
       // const selectConditionPointerMove = selectConditions.pointerMove;
       const selectConditionPointerMove = pointerMove;
       const featureSelectedPointerMove = (event) => {
+
         selectedPM.value = null
         selectedPMPosition.value = []
 
@@ -622,10 +731,10 @@
         const pmName = forecast.forecastItemHeader.forecastHeader.pm.poligono
 
         // Method 1:
-        // for (let i = 0; i < productionZones.value.length; i++) {
+        // for (let i = 0; i < vectorLayerGeojsonPOL.value.length; i++) {
 
         //   // Asignar el forecast al polígono
-        //   const properties = productionZones.value[i].getProperties()
+        //   const properties = vectorLayerGeojsonPOL.value[i].getProperties()
         //   if (properties?.id === pmId) {
         //     properties.data = forecast
         //     break;
@@ -633,7 +742,7 @@
         // }
 
         // Method 2:
-        productionZones.value = productionZones.value.map( (feature) => {
+        vectorLayerGeojsonPOL.value = vectorLayerGeojsonPOL.value.map( (feature) => {
           const properties = feature.properties
 
           if (properties?.id === pmId || properties?.name === pmName) {
@@ -753,13 +862,15 @@
         onBaseLayerChange, // Parent control (No sería necesario porque ya tenemos watch)
 
         // Vector layer
-        productionZones, // GeoJSON data
         geoJsonFormat,
-        overrideStyleFunction,
-        styleFuncFactory, // TODO
+        // Vector Layers POL (GeoJSON data)
+        vectorLayerGeojsonPOL,
+        styleFuncFactoryPOL,
+        layerSelectedPoint, // Circle with the last search PM (vectorLayerGeojsonPOL)
 
-        // Circle with the last search PM (ProductionZones)
-        layerSelectedPoint,
+        // Vector Layers PMI (GeoJSON data)
+        vectorLayerGeojsonPMI,
+        styleFuncFactoryPMI,
 
         // MouseMove: Forecast PopUp
         selectedPMPosition,

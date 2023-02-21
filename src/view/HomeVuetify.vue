@@ -123,7 +123,7 @@
         <v-radio-group
           v-model="baseLayer"
           column
-          @change="onBaseLayerChange(baseLayer)"
+          @change="onChangeLayerBase(baseLayer)"
         >
           <template v-slot:label>
             <div class="d-flex align-center">
@@ -143,6 +143,31 @@
       </div>
 
       <v-divider></v-divider>
+      <div class="d-flex flex-column align-start ml-4">
+
+        <div class="d-flex">
+          <v-icon class="me-2">mdi-layers</v-icon>
+          <span class="font-weight-bold text-h7">Capas</span>
+        </div>
+
+        <div class="d-flex flex-column ml-4 mt-2">
+          <v-switch
+            class="mt-0"
+            v-model="showLayerPOL"
+            inset
+            label="Zonas de producción"
+            @change="onchangeLayerPOL"
+          ></v-switch>
+          <v-switch
+            class="mt-0"
+            v-model="showLayerPMI"
+            inset
+            label="Puntos de muestreo"
+            @change="onchangeLayerPMI"
+          ></v-switch>
+        </div>
+      </div>
+      <v-divider></v-divider>
       <v-list>
         <v-list-item class="mt-2">
           <v-list-item-icon class="mr-1">
@@ -152,42 +177,15 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <!-------------- End of Main Menu Drawer ---------------->
 
-    <!---------------- Location Button ---------------------->
-    <!-- <md-speed-dial class="md-bottom-right" md-direction="top" style="z-index:3">
-
-      <md-speed-dial-target @click="confirmGPS" class="md-primary">
-        <md-dialog-confirm
-          v-model:md-active="showConfirmation"
-          md-title="Use Google's location service?"
-          md-content="Let Google help apps determine location. <br> This means sending <strong>anonymous</strong> location data to Google, even when no apps are running."
-          md-confirm-text="Agree"
-          md-cancel-text="Disagree"
-          @md-cancel="onCancel"
-          @md-confirm="onConfirm" />
-        <md-icon>my_location</md-icon>
-        <md-tooltip md-direction="left">Find your location</md-tooltip>
-      </md-speed-dial-target>
-      <md-speed-dial-content>
-
-        <md-button class="md-icon-button" @click="showNavigation=true">
-          <md-icon>directions</md-icon>
-          <md-tooltip md-direction="left">Start a navigation</md-tooltip>
-        </md-button>
-
-        <md-button class="md-icon-button" @click="goMapHome">
-          <md-icon>home</md-icon>
-          <md-tooltip md-direction="left">Back to campus</md-tooltip>
-        </md-button>
-
-      </md-speed-dial-content>
-    </md-speed-dial> -->
 
     <!--- Map Component --->
-    <MapComponent ref="map" :baseLayer="baseLayer" />
-    <!-- <MapComponent/> -->
-    <!-- <ol-map :center="[-38.7466364,-3.6199158]"></ol-map> -->
+    <MapComponent
+      ref="map"
+      :baseLayer="baseLayer"
+      :showLayerPOL="showLayerPOL"
+      :showLayerPMI="showLayerPMI"
+    />
 
     <!-- Play -->
     <ForecastPlay class="map-play"/>
@@ -255,7 +253,7 @@
       // >>> Base layer selection
       const { tileLayerOptions } = useMap();
 
-      const baseLayer = ref(localStorage.getItem('map-base-layer') || 'openstreetmap');
+      const baseLayer = ref(localStorage.getItem('map-layer-base') || 'openstreetmap');
       const baseLayerOptions = ['openstreetmap', 'mapbox', 'google-satellite-only'].map((key) => {
         const tileLayer = tileLayerOptions.find((element) => element.id === key);
         return {
@@ -267,13 +265,33 @@
       });
 
       // Guardamos la capa base para la próxima vez que el usuario inicie la app
-      const onBaseLayerChange = (newLayer) => {
-        localStorage.setItem('map-base-layer', newLayer);
+      const onChangeLayerBase = (newLayer) => {
+        localStorage.setItem('map-layer-base', newLayer);
         baseLayer.value = newLayer;
 
       // Send new layer to Map
-      // map.value.onBaseLayerChange(newLayer)
+      // map.value.onChangeLayerBase(newLayer)
       };
+
+      // Get boolean value if are stored at LocalStorage
+      const getLocalStorageBoolean = (key) => {
+        const value = localStorage.getItem(key)
+        if (value == 'true' || value == 'false') {
+          return JSON.parse(value) === true
+        }
+        return undefined
+      }
+      // Layers: POL, PMI
+      const showLayerPOL = ref(getLocalStorageBoolean('map-layer-pol') || true);
+      const showLayerPMI = ref(getLocalStorageBoolean('map-layer-pmi') || false);
+
+      const onchangeLayerPOL = (value) => {
+        localStorage.setItem('map-layer-pol', value)
+      }
+      const onchangeLayerPMI = (value) => {
+        localStorage.setItem('map-layer-pmi', value)
+      }
+
 
       return {
         showMenu,
@@ -290,7 +308,13 @@
         // Base layer
         baseLayer,
         baseLayerOptions,
-        onBaseLayerChange,
+        onChangeLayerBase,
+
+        showLayerPOL,
+        onchangeLayerPOL,
+
+        showLayerPMI,
+        onchangeLayerPMI,
       };
     },
   };

@@ -1,0 +1,11 @@
+{
+"type": "FeatureCollection",
+"name": "POL [Interior][Muros]",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Muros C", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -9.0730977, 42.7463661 ], [ -9.0712738, 42.7454206 ], [ -9.0677333, 42.7495333 ], [ -9.0695572, 42.7503369 ], [ -9.0730977, 42.7463661 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Muros B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -9.0389585, 42.7756214 ], [ -9.0256333, 42.7861417 ], [ -9.031899, 42.7906611 ], [ -9.038744, 42.7860157 ], [ -9.0484428, 42.7822992 ], [ -9.0389585, 42.7756214 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Muros A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9716673, 42.7773697 ], [ -8.971796, 42.7833228 ], [ -8.974371, 42.7832913 ], [ -8.9757013, 42.7808975 ], [ -8.9741778, 42.7775429 ], [ -8.9716673, 42.7773697 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Noia A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.9508748, 42.7784091 ], [ -8.9534712, 42.7802676 ], [ -8.9612603, 42.7782044 ], [ -8.9605737, 42.7743456 ], [ -8.9508748, 42.7784091 ] ] ] } }
+]
+}

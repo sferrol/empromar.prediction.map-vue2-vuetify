@@ -1,0 +1,20 @@
+{
+"type": "FeatureCollection",
+"name": "POL [Interior] [Vigo]",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Cangas F", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.831141, 42.2429427 ], [ -8.833158, 42.2480416 ], [ -8.8454318, 42.2485499 ], [ -8.8461828, 42.243594 ], [ -8.831141, 42.2429427 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas G", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8156486, 42.2424979 ], [ -8.8147259, 42.2473745 ], [ -8.8241673, 42.2481846 ], [ -8.8251328, 42.2429586 ], [ -8.8156486, 42.2424979 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas H", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8128161, 42.2421961 ], [ -8.7930965, 42.2411953 ], [ -8.7964225, 42.2469456 ], [ -8.8116145, 42.2474698 ], [ -8.8128161, 42.2421961 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas C", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7331867, 42.2601598 ], [ -8.7214279, 42.2642252 ], [ -8.7203979, 42.274832 ], [ -8.7236595, 42.2771818 ], [ -8.7312984, 42.275213 ], [ -8.7331867, 42.2601598 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas D", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7203121, 42.2649874 ], [ -8.6976528, 42.2736888 ], [ -8.7001419, 42.2776898 ], [ -8.7093258, 42.2741334 ], [ -8.7190247, 42.2781979 ], [ -8.7203121, 42.2649874 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas E", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6937904, 42.2743239 ], [ -8.680315, 42.2794679 ], [ -8.68186, 42.2815635 ], [ -8.6954212, 42.2766102 ], [ -8.6937904, 42.2743239 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Redondela A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6799717, 42.279722 ], [ -8.6706591, 42.28404 ], [ -8.6706591, 42.2885801 ], [ -8.6811733, 42.2843575 ], [ -8.6799717, 42.279722 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Redondela B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6573553, 42.2905484 ], [ -8.6425066, 42.2949609 ], [ -8.6476564, 42.3014047 ], [ -8.6510038, 42.2999763 ], [ -8.652935, 42.2948022 ], [ -8.6573553, 42.2905484 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Redondela C", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6401892, 42.2949927 ], [ -8.6444378, 42.2936594 ], [ -8.6430645, 42.2906754 ], [ -8.6390305, 42.2916912 ], [ -8.6401892, 42.2949927 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Redondela D", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6557245, 42.2874054 ], [ -8.660059, 42.2868339 ], [ -8.6601448, 42.2852148 ], [ -8.6561966, 42.285818 ], [ -8.6557245, 42.2874054 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Redondela E", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6698008, 42.2811825 ], [ -8.6689854, 42.2801347 ], [ -8.6641359, 42.283151 ], [ -8.6652517, 42.284167 ], [ -8.6698008, 42.2811825 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Vigo A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.6925459, 42.266226 ], [ -8.689971, 42.2630818 ], [ -8.6766457, 42.2694335 ], [ -8.6790276, 42.2732125 ], [ -8.6925459, 42.266226 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Baiona A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8413548, 42.1427234 ], [ -8.838501, 42.1400185 ], [ -8.8345313, 42.1422779 ], [ -8.8376641, 42.1448712 ], [ -8.8413548, 42.1427234 ] ] ] } }
+]
+}

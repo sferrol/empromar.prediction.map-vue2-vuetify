@@ -122,15 +122,23 @@
         </div>
       </div>
     </v-card>
+
+    <!--  -->
+    <ForecastCardAD :forecast="forecastLocal" />
   </div>
 </template>
 
 <script>
 // import { ref } from '@vue/composition-api'
   import { ref, watch } from 'vue';
+  // import BarChart from './BarChart'
+  import ForecastCardAD from './ForecastCardAD.vue'
 
   export default {
     name: 'forecast-component',
+    components: {
+      ForecastCardAD,
+    },
     props: {
       forecast: {
         type: Object,
@@ -142,13 +150,11 @@
       },
     },
     setup(props) {
-      // debugger
       const forecastLocal = ref(JSON.parse(JSON.stringify(props.forecast)));
 
       // props passed to setup function is reactive object (made probably by reactive()), it's properties are getters.
       // Watching a getter: https://v3.vuejs.org/api/computed-watch-api.html#watching-a-single-source
       watch(() => props.forecast, () => {
-        // debugger
         forecastLocal.value = JSON.parse(JSON.stringify(props.forecast));
       });
 

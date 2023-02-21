@@ -1,0 +1,16 @@
+{
+"type": "FeatureCollection",
+"name": "PMI [Vigo]",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "V1", "description": "Liméns" }, "geometry": { "type": "Point", "coordinates": [ -8.825, 42.23933333 ] } },
+{ "type": "Feature", "properties": { "Name": "V2", "description": "Moaña" }, "geometry": { "type": "Point", "coordinates": [ -8.71933333300001, 42.26666667 ] } },
+{ "type": "Feature", "properties": { "Name": "V3", "description": "Rande" }, "geometry": { "type": "Point", "coordinates": [ -8.64666666699998, 42.29166667 ] } },
+{ "type": "Feature", "properties": { "Name": "V4", "description": "Chapela" }, "geometry": { "type": "Point", "coordinates": [ -8.685166666999979, 42.275 ] } },
+{ "type": "Feature", "properties": { "Name": "V5", "description": "Boca Sur Vigo" }, "geometry": { "type": "Point", "coordinates": [ -8.86833333300001, 42.18166667 ] } },
+{ "type": "Feature", "properties": { "Name": "V6", "description": "Boca Norte Vigo" }, "geometry": { "type": "Point", "coordinates": [ -8.87, 42.22833333 ] } },
+{ "type": "Feature", "properties": { "Name": "V7", "description": "Samil" }, "geometry": { "type": "Point", "coordinates": [ -8.797666666670009, 42.2151666667 ] } },
+{ "type": "Feature", "properties": { "Name": "EF", "description": "Estación Fija" }, "geometry": { "type": "Point", "coordinates": [ -8.78, 42.235 ] } },
+{ "type": "Feature", "properties": { "Name": "B1", "description": "Baiona" }, "geometry": { "type": "Point", "coordinates": [ -8.86, 42.13944444 ] } }
+]
+}

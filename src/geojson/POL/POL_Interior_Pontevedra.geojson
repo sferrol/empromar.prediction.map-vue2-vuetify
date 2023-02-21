@@ -1,0 +1,15 @@
+{
+"type": "FeatureCollection",
+"name": "POL [Interior] [Pontevedra]",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Portonovo C", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7548161, 42.394812 ], [ -8.7632704, 42.3896457 ], [ -8.7633991, 42.3869197 ], [ -8.7537003, 42.3925934 ], [ -8.7548161, 42.394812 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Portonovo B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7345171, 42.4008018 ], [ -8.7407398, 42.4051116 ], [ -8.7487221, 42.3991222 ], [ -8.7424564, 42.3940513 ], [ -8.7345171, 42.4008018 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Portonovo A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7201834, 42.4138253 ], [ -8.7228441, 42.4155679 ], [ -8.7357187, 42.4097062 ], [ -8.7381649, 42.4077417 ], [ -8.7318563, 42.4021011 ], [ -8.7201834, 42.4138253 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Bueu A1", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7726688, 42.3536601 ], [ -8.7635279, 42.3513766 ], [ -8.7585068, 42.3621273 ], [ -8.7680769, 42.364125 ], [ -8.7726688, 42.3536601 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Bueu A2", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.777647, 42.3435741 ], [ -8.7688923, 42.3408779 ], [ -8.7637424, 42.3511229 ], [ -8.7727547, 42.3533112 ], [ -8.777647, 42.3435741 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Bueu B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.7910795, 42.340402 ], [ -8.7957573, 42.3407192 ], [ -8.7960148, 42.3341844 ], [ -8.7879038, 42.3336451 ], [ -8.7910795, 42.340402 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas B", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8403463, 42.3079112 ], [ -8.8485003, 42.3042295 ], [ -8.8414621, 42.2948022 ], [ -8.8327074, 42.2994367 ], [ -8.8403463, 42.3079112 ] ] ] } },
+{ "type": "Feature", "properties": { "Name": "Cangas A", "description": null }, "geometry": { "type": "Polygon", "coordinates": [ [ [ -8.8322353, 42.2972147 ], [ -8.8360548, 42.2944213 ], [ -8.830905, 42.2829605 ], [ -8.8245964, 42.2788011 ], [ -8.8248539, 42.2848973 ], [ -8.8322353, 42.2972147 ] ] ] } }
+]
+}
