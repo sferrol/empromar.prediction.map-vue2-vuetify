@@ -194,11 +194,13 @@
 
       <!-- Visualizamos la predicción al pasar por encima: Separamos del cursor para que se vea -->
       <!-- <template v-slot="slotProps"> -->
-      <!-- {{selectedPM.name}} - {{slotProps}} -->
-      <vl-overlay :position="selectedPMPosition" v-if="selectedPM">
+      <!-- {{selectedPMForecast.name}} - {{slotProps}} -->
+      <vl-overlay :position="selectedPMPosition" v-if="selectedPMForecast || isHoverForecast">
         <div :style="{ 'min-width': '400px' }">
-          <div style="margin-top: 16px; margin-left: 16px">
-            <ForecastCard :forecast="selectedPM.forecast" v-show="selectedPM.forecast"></ForecastCard>
+          <div>
+            <v-hover v-model="isHoverForecast">
+              <ForecastCard :forecast="selectedPMForecast" v-if="selectedPMForecast"></ForecastCard>
+            </v-hover>
           </div>
         </div>
       </vl-overlay>
@@ -358,7 +360,7 @@
         if (toxinTypeSelected.value) {
           localStorage.setItem('toxinType', toxinTypeSelected.value.value)
         }
-        onLoadForecast()
+        loadForecastAll()
       })
 
       /* FUNCIONS */
@@ -629,30 +631,39 @@
       // const extent = inject('ol-extent');
       // const selectConditions = inject('vl-selectconditions')
 
+      const isHoverForecast = ref(false)
       const selectedPMPosition = ref([])
-      const selectedPM = ref(null)
+      const selectedPMForecast = ref(null)
       // const selectConditionPointerMove = selectConditions.pointerMove;
       const selectConditionPointerMove = pointerMove;
       const featureSelectedPointerMove = (event) => {
 
-        selectedPM.value = null
-        selectedPMPosition.value = []
-
+        // selectedPMForecast.value = null
+        // selectedPMPosition.value = []
+        // debugger
         // Si hay algo seleccionado
         // if (event?.selected && event?.selected.length > 0) {
-        if (event.type === 'select' && event?.feature) {
+        if (event.type === 'select' && event?.feature && !isHoverForecast.value) {
           // selectedPMPosition.value = extent.getCenter(event.selected[0].getGeometry().extent_)
           selectedPMPosition.value = getCenter(event.feature.getGeometry().extent_)
 
           const properties = event.feature.getProperties()
           if (properties?.data?.forecast) {
-            selectedPM.value = {
-              name: event.feature.values_.name,
-              forecast: properties?.data?.forecast
-            }
+            selectedPMForecast.value = properties?.data?.forecast
           }
         }
+
+        //
+        if (event.type === 'unselect' && !isHoverForecast.value) {
+          selectedPMForecast.value = null
+        }
       }
+      watch(() => isHoverForecast.value, () => {
+        if (!isHoverForecast.value) {
+          selectedPMForecast.value = null
+        }
+      })
+
 
       // Todas las Features con data
       const selectInteactionFilter = (feature) => {
@@ -757,10 +768,10 @@
         })
       }
 
-      const onLoadForecast = () => {
+      const onLoadForecast = (riaId) => {
         // const url = `${API_BASE}/public/forecast?riaId=5&dateRef=${dateRef.value}$toxinType=${toxinTypeSelected.value}`
         const params = {
-          riaId: '5',
+          riaId: riaId,
           dateRef: dateRef.value || '',
           toxinType: toxinTypeSelected.value?.value || ''
         }
@@ -788,7 +799,15 @@
             loading.value = false;
           })
       }
-      onLoadForecast()
+      const loadForecastAll = (riaIds = [2,4,5,6]) => {
+        const tasks = riaIds.map(riaId => onLoadForecast(riaId))
+        Promise.all(tasks).finally(() => {
+          loading.value = false;
+        })
+      }
+      // onLoadForecast(5)
+      loadForecastAll([2,4,5,6])
+
 
       // Forecast
       const getForecastStyle = (forecast, strokeWidth = 3) => {
@@ -873,8 +892,9 @@
         styleFuncFactoryPMI,
 
         // MouseMove: Forecast PopUp
+        isHoverForecast,
         selectedPMPosition,
-        selectedPM,
+        selectedPMForecast,
         selectConditionPointerMove, // PointerMove condition
         featureSelectedPointerMove, // event on PointerMove
         selectInteactionFilter,     // Filter (Only features with data)

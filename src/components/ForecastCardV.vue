@@ -7,7 +7,7 @@
       style="width: 100%; height: 100px;"
       src="../assets/default_thumbnail.png" /> -->
 
-    <v-card class="d-flex flex-column w-100 rounded-0">
+    <v-card class="d-flex flex-column w-100 rounded-0" v-if="forecast">
       <!-- <v-card-header :style="{'background-color': getBucketH(forecast).color}">
           <div class="md-title">{{ forecast.forecastItemHeader.forecastHeader.pm.poligono }}</div>
           <div class="md-title">{{ getBucketH(forecast).text }}</div>
@@ -124,7 +124,7 @@
     </v-card>
 
     <!--  -->
-    <ForecastCardAD :forecast="forecastLocal" />
+    <ForecastCardAD :forecast="forecastLocal" v-show="forecast"/>
   </div>
 </template>
 
