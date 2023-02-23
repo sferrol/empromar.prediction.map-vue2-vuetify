@@ -186,6 +186,7 @@
       :showLayerPOL="showLayerPOL"
       :showLayerPMI="showLayerPMI"
     />
+    <!-- <MapComponent/> -->
 
     <!-- Play -->
     <ForecastPlay class="map-play"/>
@@ -203,7 +204,8 @@
 
   // Main component
   import MapComponent from '../components/MapOL.vue'; // Import Map Component
-  // import MapComponent from '../components/MapOL2.vue'; // Import Map Component
+  // import MapComponent from '../components/MapOLExt2.vue'; // Import Map Component
+  // import MapComponent from '../components/MapOLAnimation.vue'; // Import Map Component
 
   // Components
   import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component

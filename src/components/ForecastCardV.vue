@@ -121,7 +121,39 @@
           </div>
         </div>
       </div>
+      <div class="bg-white">
+        <!-- <div class="fa-3x">
+          <i class="fa-solid fa-circle-plus fa-beat"></i>
+          <i class="fa-solid fa-heart fa-beat"></i>
+          <i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s;" ></i>
+          <i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 2s;"></i>
+          <i class="fa-solid fa-heart fa-beat" style="--fa-beat-scale: 2.0;"></i>
+        </div> -->
+
+        <!-- <div class="fa-3x">
+          <i class="fas fa-chevron-up fa-spin"></i>
+          <i class="fas fa-spinner fa-spin"></i>
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <i class="fas fa-sync fa-spin"></i>
+          <i class="fas fa-cog fa-spin"></i>
+          <i class="fas fa-spinner fa-pulse"></i>
+          <i class="fas fa-stroopwafel fa-spin"></i>
+        </div> -->
+        <!-- <div class="fa-4x">
+          <i class="fas fa-seedling" data-fa-transform="shrink-8" style="background:MistyRose"></i>
+          <i class="fas fa-seedling" data-fa-transform="shrink-8 up-6" style="background:MistyRose"></i>
+          <i class="fas fa-seedling" data-fa-transform="shrink-8 right-6" style="background:MistyRose"></i>
+          <i class="fas fa-seedling" data-fa-transform="shrink-8 down-6" style="background:MistyRose"></i>
+          <i class="fas fa-seedling" data-fa-transform="shrink-8 left-6" style="background:MistyRose"></i>
+        </div> -->
+
+        <!-- <span class="fa-stack fa-2x">
+          <i class="fas fa-chevron-up fa-stack" data-fa-transform="up-8"></i>
+          <i class="fas fa-chevron-up fa-stack" data-fa-transform="up-4"></i>
+        </span> -->
+      </div>
     </v-card>
+
 
     <!--  -->
     <ForecastCardAD :forecast="forecastLocal" v-show="forecast"/>

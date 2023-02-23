@@ -155,7 +155,7 @@
       </vl-layer-vector>
 
       <!-- Geojson PMI -->
-      <vl-layer-vector v-if="showLayerPMI">
+      <vl-layer-vector ref="vectorPMI"  v-if="showLayerPMI">
         <vl-source-vector :features="vectorLayerGeojsonPMI" >
           <vl-style-func :factory="styleFuncFactoryPMI" />
         </vl-source-vector>
@@ -224,6 +224,23 @@
         </vl-source-vector>
       </vl-layer-vector>
 
+      <!-- geolocation -->
+      <VlGeoloc @update:position="onUpdatePosition">
+        <template #default="geoloc">
+          <VlFeature
+            v-if="geoloc.position"
+            id="position-feature">
+            <VlGeomPoint :coordinates="geoloc.position"/>
+            <VlStyle>
+              <VlStyleIcon
+                src="../assets/marker.png"
+                :scale="0.4"
+                :anchor="[0.5, 1]"/>
+            </VlStyle>
+          </VlFeature>
+        </template>
+      </VlGeoloc>
+
     </vl-map>
   </div>
 </template>
@@ -241,16 +258,24 @@
   // Openlayer modules
   import { GeoJSON } from 'ol/format';
   import {pointerMove} from 'ol/events/condition.js';
+
   // import { Extent } from 'ol/extent';
   // import { selectconditions } from 'vl-selectconditions'
   // eslint-disable-next-line no-unused-vars
-  import {Fill, Stroke, Style, Circle } from 'ol/style.js';
+  import {Fill, Stroke, Style, Circle, Icon, Text } from 'ol/style.js';
   // import GeometryCollection from 'ol/geom/GeometryCollection.js';
   import { getCenter } from 'ol/extent';
 
   // Vuelayers
   // eslint-disable-next-line no-unused-vars
   import { createStyle, defaultStyle} from 'vuelayers/dist/ol-ext'
+  // import ol_ext from 'ol-ext'
+
+  import FontSymbol from 'ol-ext/style/FontSymbol'
+  //   import FeatureAnimation from 'ol-ext/featureanimation/FeatureAnimation'
+  import FeatureAnimationShow from 'ol-ext/featureanimation/Show'
+  import FeatureAnimationBounce from 'ol-ext/featureanimation/Bounce'
+  // import olext from 'ol-ext/dist/ol-ext'
 
   // GeoJSON File Imports
   //import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import vectorLayerGeojsonPOL GeoJSON (LonLat)
@@ -266,6 +291,8 @@
   // DateRef
   import { format, parseISO, addDays, subDays } from 'date-fns'
   import { es } from 'date-fns/locale';
+  import Feature from 'ol/Feature';
+  import { Point } from 'ol/geom';
 
   // URL connection
   //  8060 -> symfony API
@@ -364,7 +391,9 @@
       })
 
       /* FUNCIONS */
-      const defaultMapCenter = [42.51994, -8.93902] // podría ser un objecto LatLon = { lat: 42.51994, lng: -8.93902 }
+      // const defaultMapCenter = [42.51994, -8.93902] // podría ser un objecto LatLon = { lat: 42.51994, lng: -8.93902 }
+      // const defaultMapCenter = fromLonLat([-0.12755, 51.507222], 'EPSG:4326')  // Londres
+      const defaultMapCenter = [-8.93902, 42.51994] // Arousa
       const defaultMapZoom = 12.5
 
       const getUserMapCenter = () => {
@@ -428,6 +457,7 @@
       // Map
       const view = ref(null)
       const map = ref(null)
+      const vectorPMI = ref(null)
 
       const mapProjection = ref('EPSG:4326')    // EPSG:3857 - Proyección WGS84 / Pseudo-Mercator (Usa [Lng,Lat])
       const mapCenter = ref(getUserMapCenter()) // convert2CoordinateReverse() Trabajamos directamente con [Lng,Lat]
@@ -552,9 +582,66 @@
               color: 'yellow',
               width: 2
             })
-          })
+          }),
+          // text: new Text({
+          //   // text: '\uf077', // Código del icono de FontAwesome que deseas utilizar
+          //   text: '\uf05e', // Código del icono de FontAwesome que deseas utilizar
+          //   font: 'FontAwesome', // Fuente del icono
+          //   // textAlign: 'center', // Alineación del texto
+          //   // textBaseline: 'middle', // Alineación vertical del texto
+          //   // offsetY: -10, // Ajuste vertical del icono (en píxeles)
+          //   fill: new Fill({
+          //     color: '#3399CC' // Color del icono
+          //   })
+          // }),
+          // text: new Text({
+          //   text: '\uf077',
+          //   font: '900 18px "Font Awesome 5 Free"',
+          //   className: 'fas fa-chevron-up fa-spin',
+          //   offsetX: 4,
+          //   scale: 1,
+          //   // textAlign: 'center', // Alineación del texto
+          //   // textBaseline: 'middle', // Alineación vertical del texto
+          //   fill: new Fill({
+          //     color: '#3399CC'
+          //   })
+          // }),
+          // <i class="fas fa-chevron-up"></i>
+          // image: new FontSymbol({
+          //   // glyph: "fa-chevron-up",
+          //   // text: '\uf093',    // text to use if no glyph is defined
+          //   // font: 'sans-serif',
+          //   // fontSize: 1,
+          //   // fontStyle: '',
+          //   form: 'none',
+          //   glyph: 'fa-map-marker',
+          //   color: '#ffcc33',
+          //   offsetY: -15,
+          //   fontSize: 1.5,
+          //   // form: 'circle',
+          //   radius: 20,
+          //   fill: new Fill({color: "#3399CC"}),
+          //   stroke: new Stroke({
+          //     color: "#fff",
+          //     width: 2
+          //   })
+          // })
         });
         // debugger
+
+        const arrow1Style = (offsetY) => {
+          return new Style({
+            text: new Text({
+              text: '\uf077',
+              font: '900 18px "Font Awesome 5 Free"',
+              offsetY: offsetY,
+              scale: 0.8,
+              fill: new Fill({
+                color: '#3399CC'
+              })
+            }),
+          })
+        }
 
 
         // feature - ol.Feature instance
@@ -567,28 +654,120 @@
           //   return [getForecastStyle(properties?.data?.forecast, calcStrikeWidth(resolution))]
           // }
           // pointStyle.getImage().setRadius(calculateCircleRadius(resolution, mapZoom.value))
-          pointStyle.getImage().setRadius((0.004 / resolution))
-          pointStyle.getImage().getStroke().setWidth(calcStrikeWidth(resolution))
-          return [pointStyle]
+          // pointStyle.getImage().setRadius((0.004 / resolution))
+          // pointStyle.getImage().getStroke().setWidth(calcStrikeWidth(resolution))
+          // debugger
+          // setInterval(() => { feature.setStyle(arrow1Style(8))}, 1000)
+          // setInterval(() => { feature.setStyle(arrow1Style(0))}, 1333)
+          // setInterval(() => { feature.setStyle(arrow1Style(-8))}, 1666)
 
-          // Modificamos el radio en función de la resolución
-          // return [
-          //   new Style({
-          //     image: new Circle({
-          //       radius: (0.004 / resolution), // > resolución ==> + paqueño
-          //       fill: new Fill({
-          //         color: [255, 255, 255, 0]
-          //       }),
-          //       stroke: new Stroke({
-          //         color: 'yellow',
-          //         width: 1
-          //       })
-          //     })
-          //   })
-          // ]
+          return [pointStyle]
         }
       }
       /// <<<
+
+      // Crear un estilo de icono
+      // eslint-disable-next-line no-unused-vars
+      // var iconStyle = new Style({
+      //   image: new Icon({
+      //     src: 'assets/marker.png',
+      //     scale: 0.4,
+      //     anchor: [0.5, 1],
+      //     offset: [0.5, 0.5],
+      //     offsetOrigin: 'bottom-left',
+      //     rotateWithView: true,
+      //     rotation: 0.5
+      //   })
+      // });
+      // eslint-disable-next-line no-unused-vars
+      var iconStyle = new Style({
+        image: new Icon({
+          src: 'assets/marker.png',
+          imgSize: [88, 88],
+          className: 'fa-animation',
+          anchor: [0.5, 0.5],
+          rotateWithView: true
+        })
+      });
+      // eslint-disable-next-line no-unused-vars
+      var fontawesomeStyle = new Style({
+        text: new Text({
+          // text: '\uf077', // Código del icono de FontAwesome que deseas utilizar
+          text: '\uf041', // Código del icono de FontAwesome que deseas utilizar
+          font: 'FontAwesome', // Fuente del icono
+          textAlign: 'center', // Alineación del texto
+          textBaseline: 'middle', // Alineación vertical del texto
+          offsetY: -10, // Ajuste vertical del icono (en píxeles)
+          fill: new Fill({
+            color: '#3399CC' // Color del icono
+          })
+        })
+      });
+
+
+      // const iconStyle = new Style({
+      //   image: new Icon({
+      //     anchor: [0.2, 20],
+      //     anchorXUnits: 'fraction',
+      //     anchorYUnits: 'pixels',
+      //     src: 'assets/marker.png',
+      //   }),
+      // });
+
+      // var icono = new Icon({
+      //   anchor: [0.5, 46], // Posición del ancla del icono (en píxeles)
+      //   anchorXUnits: 'fraction', // Unidades del ancla (fracción del icono)
+      //   anchorYUnits: 'pixels', // Unidades del ancla (píxeles)
+      //   src: 'assets/logo.png' // Ruta a tu archivo de icono
+      // });
+
+
+      // Animar el estilo de icono
+      // eslint-disable-next-line no-unused-vars
+      // var animateStyle = (event) => {
+      //   debugger
+      //   var vectorContext = event.vectorContext;
+      //   var frameState = event.frameState;
+      //   //var elapsedTime = frameState.time - frameState.startTime;
+      //   //var distance = (elapsedTime * 0.1) % 100;
+      //   //var pixel = [distance, 0];
+
+      //   const feature = vectorLayerGeojsonPOL.value[0]
+      //   // const coor = feature.getGeometry().extent_ // feature.getGeometry().getCoordinates()
+      //   var coords = map.value.getPixelFromCoordinate(feature.geometry.coordinates);
+      //   vectorContext.drawFeature(new Feature({
+      //     geometry: new Point(coords),
+      //     name: 'moving-icon'
+      //   }), new Style({
+      //     image: new Icon({
+      //       src: 'assets/logo.png',
+      //       scale: 1.5,
+      //       offset: [0.5, 0.5],
+      //       offsetOrigin: 'bottom-left',
+      //       rotateWithView: true,
+      //       rotation: frameState.time / 1000
+      //     })
+      //   }));
+      //   map.value.render();
+      // };
+
+      // Agregar una capa de vector para el icono animado
+      // var vectorLayer = new ol.layer.Vector({
+      //   source: new ol.source.Vector({
+      //     features: [
+      //       new ol.Feature({
+      //         geometry: new ol.geom.Point([0, 0])
+      //       })
+      //     ]
+      //   }),
+      //   style: iconStyle
+      // });
+
+      // // Agregar la capa de vector al mapa
+      // map.addLayer(vectorLayer);
+
+      // Iniciar la animación del estilo de icono
+      // map.on('postcompose', animateStyle);
 
 
       // >>> Events
@@ -596,6 +775,25 @@
       const forecastMinimize = ref(true)
       const showForecast = (forecast) => {
         forecastSelected.value = forecast;
+      }
+
+      // const scaleAnimation = new Animation({
+      //   duration: 2000,
+      //   easing: ol.easing.easeOut
+      // })
+
+      const arrow1Style = (offsetY) => {
+        return new Style({
+          text: new Text({
+            text: '\uf077',
+            font: '900 18px "Font Awesome 5 Free"',
+            offsetY: offsetY,
+            scale: 0.8,
+            fill: new Fill({
+              color: '#3399CC'
+            })
+          }),
+        })
       }
 
       // On click feature
@@ -611,6 +809,11 @@
           // Indicamos la coordenada donde mostraremos un círculo (Vers tags arriba)
           if (feature?.getGeometry()?.getCoordinates()) {
             layerSelectedPoint.value = getCenterCoordinateOfPoligone(feature.getGeometry().getCoordinates())
+
+            // debugger
+            // setInterval(() => { feature.setStyle(arrow1Style(8))}, 1000)
+            // setInterval(() => { feature.setStyle(arrow1Style(0))}, 1000)
+            // setInterval(() => { feature.setStyle(arrow1Style(-8))}, 1000)
           }
         } else {
           if (forecastMinimize.value) {
@@ -619,12 +822,14 @@
         }
       }
 
+
       // Despues de haber creado el mapa...
       onMounted( () => {
         // debugger
         // >>> Map Click: Creamos un evento para controlar cuando hace click fuera del polígono
         // map.value.on('click', onFeatureClick)
         map.value.$el.addEventListener('click', onFeatureClick, false)
+        // map.value.$el.addEventListener('postcompose', animateStyle, false)
       })
 
       // Mouse control
@@ -846,7 +1051,16 @@
         })
       }
 
+      const deviceCoordinate = ref(null)
+      const onUpdatePosition = (coordinate) => {
+        // debugger
+        deviceCoordinate.value = coordinate
+      }
+
       return {
+        onUpdatePosition,
+        deviceCoordinate,
+
         mobile, // Desactivar mousePointer
         xs,
         vuetify,
@@ -865,6 +1079,7 @@
         // Map
         map,
         view,
+        vectorPMI,
         mapProjection,
         mapRotation,
         mapCenter,

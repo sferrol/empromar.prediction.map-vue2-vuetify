@@ -6456,6 +6456,11 @@ obuf@^1.0.0, obuf@^1.1.2:
   resolved "https://registry.npmmirror.com/obuf/-/obuf-1.1.2.tgz#09bea3343d41859ebd446292d11c9d4db619084e"
   integrity sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==
 
+ol-ext@^4.0.6:
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/ol-ext/-/ol-ext-4.0.6.tgz#5c9d8c7042f6b88dd21a725bbb2429162248badd"
+  integrity sha512-SG90ILjlHT302Zqgr3AR87M4yq4E96g2SJWlkliZDcF++QK4rMja1lId0w/cKMuGSPWSC79lD73eh1vcQlHdGw==
+
 ol-mapbox-style@^8.0.5:
   version "8.2.1"
   resolved "https://registry.yarnpkg.com/ol-mapbox-style/-/ol-mapbox-style-8.2.1.tgz#0f0c252b6495853a137d7e4dd3f915fab664b356"

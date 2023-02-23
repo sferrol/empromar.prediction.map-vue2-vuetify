@@ -12,7 +12,7 @@
         <v-spacer></v-spacer>
         <div class="d-flex align-center">
           <v-icon>mdi-monitor-dashboard</v-icon>
-          <a :href="getUrlInforme(forecastLocal)" target="_blank" class="ml-1">Ver Informe</a>
+          <!-- <a :href="getUrlInforme(forecastLocal)" target="_blank" class="ml-1">Ver Informe</a> -->
         </div>
       </div>
 
