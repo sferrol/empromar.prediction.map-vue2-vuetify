@@ -271,10 +271,10 @@
   import { createStyle, defaultStyle} from 'vuelayers/dist/ol-ext'
   // import ol_ext from 'ol-ext'
 
-  import FontSymbol from 'ol-ext/style/FontSymbol'
+  // import FontSymbol from 'ol-ext/style/FontSymbol'
   //   import FeatureAnimation from 'ol-ext/featureanimation/FeatureAnimation'
-  import FeatureAnimationShow from 'ol-ext/featureanimation/Show'
-  import FeatureAnimationBounce from 'ol-ext/featureanimation/Bounce'
+  // import FeatureAnimationShow from 'ol-ext/featureanimation/Show'
+  // import FeatureAnimationBounce from 'ol-ext/featureanimation/Bounce'
   // import olext from 'ol-ext/dist/ol-ext'
 
   // GeoJSON File Imports
@@ -291,8 +291,8 @@
   // DateRef
   import { format, parseISO, addDays, subDays } from 'date-fns'
   import { es } from 'date-fns/locale';
-  import Feature from 'ol/Feature';
-  import { Point } from 'ol/geom';
+  // import Feature from 'ol/Feature';
+  // import { Point } from 'ol/geom';
 
   // URL connection
   //  8060 -> symfony API
@@ -629,19 +629,19 @@
         });
         // debugger
 
-        const arrow1Style = (offsetY) => {
-          return new Style({
-            text: new Text({
-              text: '\uf077',
-              font: '900 18px "Font Awesome 5 Free"',
-              offsetY: offsetY,
-              scale: 0.8,
-              fill: new Fill({
-                color: '#3399CC'
-              })
-            }),
-          })
-        }
+        // const arrow1Style = (offsetY) => {
+        //   return new Style({
+        //     text: new Text({
+        //       text: '\uf077',
+        //       font: '900 18px "Font Awesome 5 Free"',
+        //       offsetY: offsetY,
+        //       scale: 0.8,
+        //       fill: new Fill({
+        //         color: '#3399CC'
+        //       })
+        //     }),
+        //   })
+        // }
 
 
         // feature - ol.Feature instance
@@ -782,19 +782,19 @@
       //   easing: ol.easing.easeOut
       // })
 
-      const arrow1Style = (offsetY) => {
-        return new Style({
-          text: new Text({
-            text: '\uf077',
-            font: '900 18px "Font Awesome 5 Free"',
-            offsetY: offsetY,
-            scale: 0.8,
-            fill: new Fill({
-              color: '#3399CC'
-            })
-          }),
-        })
-      }
+      // const arrow1Style = (offsetY) => {
+      //   return new Style({
+      //     text: new Text({
+      //       text: '\uf077',
+      //       font: '900 18px "Font Awesome 5 Free"',
+      //       offsetY: offsetY,
+      //       scale: 0.8,
+      //       fill: new Fill({
+      //         color: '#3399CC'
+      //       })
+      //     }),
+      //   })
+      // }
 
       // On click feature
       const onFeatureClick = async (event) => {
