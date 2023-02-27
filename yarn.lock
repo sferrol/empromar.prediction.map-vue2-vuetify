@@ -5947,6 +5947,16 @@ launch-editor@^2.2.1, launch-editor@^2.6.0:
     picocolors "^1.0.0"
     shell-quote "^1.7.3"
 
+leaflet.smoothzoom@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/leaflet.smoothzoom/-/leaflet.smoothzoom-0.1.1.tgz#93b947e275f93d2e9ae3328aecfe2bf57b4bf06c"
+  integrity sha512-D3JkH8z+yLnmget8R4xCeIsrP6oqGsYFN/eAZIDUpB5mkwOXNsh+DRxxXmmH2avibzA8K7Kjlxv6URED7NnggQ==
+
+leaflet@^1.9.3:
+  version "1.9.3"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.3.tgz#52ec436954964e2d3d39e0d433da4b2500d74414"
+  integrity sha512-iB2cR9vAkDOu5l3HAay2obcUHZ7xwUBBjph8+PGtmW/2lYhbLizWtG7nTeYht36WfOslixQF9D/uSIzhZgGMfQ==
+
 lerc@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/lerc/-/lerc-3.0.0.tgz#36f36fbd4ba46f0abf4833799fff2e7d6865f5cb"

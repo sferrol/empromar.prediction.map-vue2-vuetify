@@ -203,9 +203,10 @@
   import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import rooms GeoJSON
 
   // Main component
-  import MapComponent from '../components/MapOL.vue'; // Import Map Component
+  // import MapComponent from '../components/MapOL.vue'; // Import Map Component
   // import MapComponent from '../components/MapOLExt2.vue'; // Import Map Component
   // import MapComponent from '../components/MapOLAnimation.vue'; // Import Map Component
+  import MapComponent from '../maps/mapLeaflet.vue'; // Import Map Component
 
   // Components
   import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component

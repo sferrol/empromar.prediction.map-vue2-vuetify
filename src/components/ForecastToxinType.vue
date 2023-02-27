@@ -1,7 +1,7 @@
 <template>
-  <div class="d-flex align-center" style="height: 56px;">
+  <div class="d-flex align-center" style="height-: 56px;">
     <!-- offset-y + top:Hacia arriba en XS  or bottom: Hacia abajo en XS -->
-    <v-menu
+    <!-- <v-menu
       transition="scale-transition"
       origin="center center"
       v-model="isToxinTypeOpen"
@@ -9,13 +9,24 @@
       offset-y
       :top="$vuetify.breakpoint.xs"
       :bottom="!$vuetify.breakpoint.xs"
+    > -->
+
+    <!-- Abrimos hacia la izquierda -->
+    <v-menu
+      transition="scale-transition"
+      origin="center center"
+      v-model="isToxinTypeOpen"
+      open-on-hover
+      offset-x
+      left
+      direction="left"
     >
       <template v-slot:activator="{ on, attrs }">
         <v-btn
           v-on="on"
           v-bind="attrs"
           v-model="isToxinTypeOpen"
-          small
+          x-small
           fab
           :loading="loading"
           :color="(toxinTypeSelected && toxinTypeSelected.color) || 'blue darken-2'"
@@ -28,15 +39,15 @@
       </template>
 
       <!-- <div class="d-flex flex-column" :class="[$vuetify.breakpoint.xs ? 'mb-12' : 'mt-12']"> -->
-      <div class="d-flex flex-column">
+      <div class="d-flex flex-column-">
         <!-- @click="toxinTypeSelected = item" -->
         <v-btn
-          class="my-2"
+          class="mx-2"
           v-for="(item, index) in toxinTypeOptions"
           :key="index"
           v-show="toxinTypeSelected && toxinTypeSelected.value !== item.value"
           fab
-          small
+          x-small
           :color="item.color"
           @click="$emit('update:toxinTypeSelected', item)"
         >

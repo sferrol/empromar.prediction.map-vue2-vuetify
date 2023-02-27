@@ -18,11 +18,15 @@ export default function useMap() {
       id: 'openstreetmap',
       url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
       attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>',
+      icon: 'mdi-terrain',
+      text: 'OS'
     },
     {
       id: 'mapbox',
       url: 'https://api.mapbox.com/styles/v1/parksideindoor/cki8uc2193zu919qv2uhe53dk/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicGFya3NpZGVpbmRvb3IiLCJhIjoiY2tnaGU1MHowMDN0czJ6bWU1ajVoeTlneCJ9.KfnSk61OsHyGuvWLn3M6bA',
       attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
+      icon: 'mdi-mapbox',
+      text: 'MBox'
     },
     {
       id: 'osmand',
@@ -49,6 +53,8 @@ export default function useMap() {
       id: 'google-satellite-only',
       url: 'http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}',
       attribution: '&copy; <a href="https://developers.google.com/maps">Google Maps</a>',
+      icon: 'mdi-satellite-variant',
+      text: 'GSat'
     },
     {
       id: 'google-terrain-only',
