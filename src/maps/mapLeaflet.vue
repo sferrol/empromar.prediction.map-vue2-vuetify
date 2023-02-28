@@ -213,7 +213,7 @@
   // import "leaflet.smoothzoom/L.Map.SmoothZoom"
   // import "../plugins/leaflet/SmoothZoom" // Zoom smooth as openlayers
   import "../plugins/leaflet/SmoothWheelZoom" // Zoom smooth as openlayers
-  import "../plugins/leaflet/RotateDist"
+  // import "../plugins/leaflet/RotateDist"
 
   // GIS helpers
   import * as turf from '@turf/turf'; // Import turf for GIS functions
@@ -690,13 +690,13 @@
           smoothSensitivity: 2,   // zoom speed. default is 1
 
           // Plugin Rotate (Ver RotateDist)
-          rotate: true,                 // Activate rotation
-          bearing: mapRotation.value,   // Set default rotation
-          touchRotate: true,            // ??
-          rotateControl: {              // Paint rotate control (Deshabilitamos)
-            closeOnZeroBearing: false,
-            // position: 'bottomleft',  // Si no indicamos se oculta
-          },
+          // rotate: true,                 // Activate rotation
+          // bearing: mapRotation.value,   // Set default rotation
+          // touchRotate: true,            // ??
+          // rotateControl: {              // Paint rotate control (Deshabilitamos)
+          //   closeOnZeroBearing: false,
+          //   // position: 'bottomleft',  // Si no indicamos se oculta
+          // },
         }).setView(mapCenter.value, mapZoom.value);
 
         //
@@ -991,12 +991,12 @@
     left: 10px;
   }
 
-
+  /* Forecast */
   .overlay-forecast-wrapper{
     position: absolute;
     bottom: 0;
     max-width: 420px;
-    z-index: 1;
+    z-index: 6;
     width: 100%;
   }
 
