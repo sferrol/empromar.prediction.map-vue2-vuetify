@@ -166,13 +166,13 @@
   import { ref, watch } from 'vue';
   // import BarChart from './BarChart'
   import ForecastCardAD from './ForecastCardAD.vue'
-  import ChartBarGauge from './ChartBarGauge.vue'
+  // import ChartBarGauge from './ChartBarGauge.vue'
 
   export default {
     name: 'forecast-component',
     components: {
       ForecastCardAD,
-      ChartBarGauge,
+      // ChartBarGauge,
     },
     props: {
       forecast: {
