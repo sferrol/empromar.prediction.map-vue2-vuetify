@@ -206,7 +206,7 @@
   // import MapComponent from '../components/MapOL.vue'; // Import Map Component
   // import MapComponent from '../components/MapOLExt2.vue'; // Import Map Component
   // import MapComponent from '../components/MapOLAnimation.vue'; // Import Map Component
-  import MapComponent from '../maps/mapLeaflet.vue'; // Import Map Component
+  import MapComponent from '../maps/mapLeaflet2.vue'; // Import Map Component
 
   // Components
   import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component
@@ -238,7 +238,7 @@
         }
         const selected = zoneListArousa.features.find((item) => item?.properties?.name === productionZoneFilterLocal.value);
         if (selected) {
-          map.value.goProductionZone(selected); // La funcion ha sido desarrollada en el componente Map.vue
+          map.value.goProductionZone(selected.properties.name); // La funcion ha sido desarrollada en el componente Map.vue
         }
       };
 

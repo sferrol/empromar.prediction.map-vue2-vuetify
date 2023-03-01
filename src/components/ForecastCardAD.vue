@@ -4,7 +4,7 @@
     <v-card class="d-flex flex-column w-100 rounded-0">
 
       <!-- Header -->
-      <div class="d-flex pa-3">
+      <div class="d-flex px-3 py-2">
         <div class="d-flex align-baseline">
           <h3>Avance / Descenso</h3><span class="ml-1">de Toxina</span>
         </div>
@@ -17,7 +17,7 @@
       </div>
 
       <!-- Body -->
-      <div class="d-flex flex-column pa-3">
+      <div class="d-flex flex-column px-3 py-0">
 
         <!-- Bucket Left + Right -->
         <!-- <div class="d-flex">
@@ -50,7 +50,7 @@
           </div>
         </div> -->
 
-        <div class="position-relative mb-5">
+        <div class="position-relative">
           <Bar
             id="chart-ad"
             :options="chartOptions"

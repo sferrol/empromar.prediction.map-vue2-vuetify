@@ -29,7 +29,7 @@
       </v-toolbar>
 
       <!-- Body -->
-      <div class="pa-3">
+      <div class="px-3 py-2">
         <div style="display: grid; grid-template-columns: 36% 64%; font-size: 14px;">
           <!-- Bucket Left: Current ToxA -->
           <div class="d-flex flex-column mt-1">
@@ -157,6 +157,7 @@
 
     <!--  -->
     <ForecastCardAD :forecast="forecastLocal" v-show="forecast"/>
+    <!-- <ChartBarGauge></ChartBarGauge> -->
   </div>
 </template>
 
@@ -165,11 +166,13 @@
   import { ref, watch } from 'vue';
   // import BarChart from './BarChart'
   import ForecastCardAD from './ForecastCardAD.vue'
+  import ChartBarGauge from './ChartBarGauge.vue'
 
   export default {
     name: 'forecast-component',
     components: {
       ForecastCardAD,
+      ChartBarGauge,
     },
     props: {
       forecast: {

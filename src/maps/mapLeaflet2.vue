@@ -1,4 +1,4 @@
-<template>
+l<template>
   <div>
     <SidebarPOL class="sidebar_pol" :isSidebarActive.sync="isPOLOpen"></SidebarPOL>
 
@@ -25,30 +25,18 @@
           >
             <v-icon color="white">mdi-minus</v-icon>
           </v-btn>
-
-          <!-- Restamos 45º porque es la inclinación que trae el icono -->
-          <!-- <v-btn
-            v-if="mapRotation !== 0"
-            class="my-3"
-            :style="{transform: `rotate(${mapRotation - 45}deg)`}"
-            x-small
-            fab
-            :color="'grey'"
-            @click="onMapRotateReset"
-          >
-            <v-icon color="white">mdi-compass</v-icon>
-          </v-btn> -->
-          <!-- <v-btn
+          <v-btn
             class="my-1"
             x-small
             fab
             :color="'grey'"
-            @click="onMapRotateControl(45)"
+            @click="onMapZoomControl(-1)"
           >
-            <v-icon color="white">mdi-sun-compass</v-icon>
-          </v-btn> -->
+            <ChartBarGauge ref="chartBarGaugeRef" style="max-width: 32px;"></ChartBarGauge>
+          </v-btn>
         </div>
       </div>
+
       <div class="map_extra_tools">
         <div class="d-flex flex-column">
 
@@ -95,21 +83,6 @@
       <!-- Date: Prev + Date + Next [Mismo estilo que el toolbar]-->
       <div class="data-ref-wrapper" :class="[ $vuetify.breakpoint.xs ? 'data-ref-wrapper-bottom' : 'data-ref-wrapper-top' ]">
         <div class="d-flex align-center" style="height: 56px;">
-          <!-- <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-on="on"
-              v-bind="attrs"
-              color="primary"
-              fab
-              small
-              @click="setDatePrev()"
-            >
-              <v-icon size="24">mdi-chevron-left</v-icon>
-            </v-btn>
-          </template>
-          <span>Anterior</span>
-        </v-tooltip> -->
 
           <!-- v-model="modal" -->
           <v-dialog
@@ -143,29 +116,15 @@
               @input="$refs.dialog.save(dateRef)"
             />
           </v-dialog>
-        <!-- <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              v-on="on"
-              v-bind="attrs"
-              color="primary"
-              fab
-              small
-              @click="setDateNext()"
-            >
-              <v-icon size="24">mdi-chevron-right</v-icon>
-            </v-btn>
-          </template>
-          <span>Siguiente</span>
-        </v-tooltip> -->
         </div>
       </div>
 
       <!-- ForecastSelected -->
+      <!-- :class="{ 'overlay-forecast-wrapper-mobile' : $vuetify.breakpoint.xs || !forecastMinimize }" -->
       <div
         v-if="forecastSelected"
         class="overlay-forecast-wrapper"
-        :class="{ 'overlay-forecast-wrapper-mobile' : $vuetify.breakpoint.xs || !forecastMinimize }"
+        :class="{ 'overlay-forecast-wrapper-mobile' : !forecastMinimize }"
       >
 
         <!-- Imagen Superior: Rana del tiempo -->
@@ -186,49 +145,83 @@
         </ForecastCard>
       </div>
 
-      <!-- LeaveLet Map -->
-      <div id="map"></div>
       <div id="info_container"></div>
+
+      <!-- Leaflet Map -->
+      <!-- <div id="map"></div> -->
+      <!-- :zoomAnimation="true" -->
+      <l-map
+        id="map"
+        ref="map"
+        :zoom.sync="mapZoom"
+        :center.sync="mapCenter"
+        :options="{
+          zoomControl: false,
+          attributionControl: false,
+          // zoomSnap: true
+          // zoomSnap: 0.25,
+        }">
+
+        <l-tile-layer :url="tileLayerSelected.url" :options="{ maxNativeZoom:19, maxZoom:21, minZoom:6 }"></l-tile-layer>
+        <!-- <ChartBarGauge></ChartBarGauge> -->
+
+        <!-- <l-marker
+          :lat-lng="mapCenter"
+        >
+          <ChartBarGauge style="max-width: 32px;"></ChartBarGauge>
+        </l-marker> -->
+
+        <l-layer-group>
+          <l-circle-marker
+            v-if="layerSelectedPoint"
+            :lat-lng="layerSelectedPoint"
+            :radius="2"
+          />
+
+          <l-geo-json
+            v-if="showLayerPOL"
+            :geojson="vectorLayerGeojsonPOL"
+            :options="{ style: getGeojsonStylePOL, onEachFeature: onEachFeaturePOL }"
+          ></l-geo-json>
+
+          <l-geo-json
+            v-if="showLayerPMI"
+            :geojson="vectorLayerGeojsonPMI"
+            :options="{ pointToLayer: onPointToLayer }"
+          ></l-geo-json>
+        </l-layer-group>
+      </l-map>
+
     </div>
   </div>
 </template>
 
 <script>
-  import { computed, onMounted, ref, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
+  import axios from 'axios';
 
   // Leaflet
   import "leaflet/dist/leaflet.css";
   import L from "leaflet";
+  import { LMap, LTileLayer, LGeoJson, LLayerGroup, LMarker, LTooltip, LCircleMarker } from 'vue2-leaflet'; // Import vue leaflet
 
-  // Importamos los plugings
-  // import "leaflet.smoothzoom/L.Map.SmoothZoom"
-  // import "../plugins/leaflet/SmoothZoom" // Zoom smooth as openlayers
-  import "../plugins/leaflet/SmoothWheelZoom" // Zoom smooth as openlayers
-  // import "../plugins/leaflet/RotateDist"
-
-  // GIS helpers
-  import * as turf from '@turf/turf'; // Import turf for GIS functions
-  import * as turfHelper from '@turf/helpers';  // Import turfHelper for GIS function helpers
-
-
-  // GeoJSON File Imports
-  //import zoneListArousa from '../geojson/POL_Interior_Arousa.json'; // Import vectorLayerGeojsonPOL GeoJSON (LonLat)
+  // GeoJSON Files (Import before undate from API)
+  //  Ojo que las coordendas en un Geojson se indican LonLat
   import geojsonDataPOL from '../geojson/POL.json'; // Import vectorLayerGeojsonPOL GeoJSON (LonLat)
   import geojsonDataPMI from '../geojson/PMI.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
 
+  // DateRef + MapCenter + MapZoom + MapRotation
   import useMap from '@/service/useMap';
+  import useUtilsMap from '@/service/useUtilsMap';
+  import useForecastLeafLet from '@/service/useForecastLeafLet';
 
   // Components
   import ForecastCard from '../components/ForecastCardV.vue'
   import ForecastToxinType from '../components/ForecastToxinType.vue';
   import ForecastTable from '@/components/ForecastTable.vue';
   import SidebarPOL from '@/components/SidebarPOL.vue';
-
-  // DateRef
-  import { format, parseISO, addDays, subDays } from 'date-fns'
-  import { es } from 'date-fns/locale';
-  import axios from 'axios';
   import MapBaseLayer from '@/components/MapBaseLayer.vue';
+  import ChartBarGauge from '@/components/ChartBarGauge.vue'
 
   // URL connection
   const API_BASE = process.env.VUE_APP_API_BASE
@@ -236,11 +229,21 @@
   export default {
     name: "map-component",
     components: {
+      LMap,
+      LTileLayer,
+      LGeoJson,
+      LLayerGroup,
+      // eslint-disable-next-line vue/no-unused-components
+      LMarker,
+      LCircleMarker,
+      // eslint-disable-next-line vue/no-unused-components
+      LTooltip,
       ForecastCard,
       ForecastToxinType,
       ForecastTable,
       SidebarPOL,
       MapBaseLayer,
+      ChartBarGauge,
     },
     props: {
       baseLayer: {
@@ -268,39 +271,11 @@
       const toxinTypeSelected = ref(toxinTypeOptions.find(item => item.value === (localStorage.getItem('toxinType') || 'DSP')));
 
       /** --- DateRef --- */
-      const getLastDateRefUsed = () => {
-        const ls = localStorage.getItem('dateRef')
-        if (ls === 'now') {
-          return format(parseISO(new Date().toISOString()), 'yyyy-MM-dd')
-        }
-        return localStorage.getItem('dateRef')
-      }
-      const setLastDateRefUsed = (dateRefString) => {
-        if (dateRefString === format(parseISO(new Date().toISOString()), 'yyyy-MM-dd')) {
-          localStorage.setItem('dateRef', 'now')
-        } else {
-          localStorage.setItem('dateRef', dateRefString)
-        }
-      }
-
-      // Fecha de referencia
-      //  dateRef:          String: (2023-02-16)  - Fecha del componente v-datepicker
-      //  dateRefFormatted  String: (Jue 16)      - Fecha de visualización
-      const dateRef = ref( format(parseISO(getLastDateRefUsed() || new Date().toISOString()), 'yyyy-MM-dd') );
-      const dateRefFormatted = computed( () => {
-        return dateRef.value ? format(parseISO(dateRef.value), "EEE d", { locale: es }) : ''
-      })
-      const setDatePrev = () => {
-        if (dateRef.value) {
-          dateRef.value = format(subDays(parseISO(dateRef.value), 1), 'yyyy-MM-dd');
-        }
-      }
-      const setDateNext = () => {
-        if (dateRef.value) {
-          dateRef.value = format(addDays(parseISO(dateRef.value), 1), 'yyyy-MM-dd');
-        }
-      }
-      /** */
+      const {
+        dateRef,
+        dateRefFormatted,
+        setLastDateRefUsed
+      } = useMap()
 
       // Actualizar la predicción al cambiar el contexto
       watch([
@@ -316,50 +291,20 @@
         loadForecastAll()
       })
 
-      /* LocalStorage functions */
-      const {
-        getUserMapCenter,
-        setUserMapCenter,
-        getUserMapZoom,
-        setUserMapZoom,
-        getUserMapRotation,
-        setUserMapRotation
-      } = useMap()
-
       // Productions Zones
       // Geojson:
       //  EPSG:4326 equivale a WGS84 => L.CRS.EPSG4326 (Default) (LNG-LAT)
       //  EPSG 3857 google Earth
-      // const productionZoneList = { type: "FeatureCollection", features: zoneListArousa.features }; // Geojson is LonLat coordinates
       const vectorLayerGeojsonPOL = ref(geojsonDataPOL.features)
-      // eslint-disable-next-line no-unused-vars
       const vectorLayerGeojsonPMI = ref(geojsonDataPMI.features)
 
-      // Map
+      // Map (With LeafLet no se puede cambiar mapProjection)
       const map = ref(null)
-
-      // const mapProjection = ref('EPSG:4326')    // EPSG:3857 - Proyección WGS84 / Pseudo-Mercator (Usa [Lng,Lat])
-      const mapCenter = ref(getUserMapCenter()) // convert2CoordinateReverse() Trabajamos directamente con [Lng,Lat]
-      const mapZoom = ref(getUserMapZoom())
-      const mapRotation = ref(getUserMapRotation())
+      const { mapCenter, mapZoom } = useMap()
 
 
-
-      // >>> Base layer selection
+      // >>> Base layer selection: Ojo que se puede cambiar en 2 sitios (Gestionar)
       const { tileLayerOptions } = useMap()
-
-      // debugger
-      const baseLayers = ['openstreetmap', 'mapbox', 'google-satellite-only'].map((key) => {
-        const tileLayer = tileLayerOptions.find((element) => element.id === key);
-        return L.tileLayer(tileLayer.url, {id: tileLayer.id, attribution: tileLayer.attribution});
-      });
-      // const baseMaps = baseLayers.reduce((acc,curr)=> (acc[curr]='',acc),{});
-      // let baseMaps = []
-      // baseMaps['openstreetmap'] = baseLayers.find((element) => element.options.id === 'openstreetmap')
-      // baseMaps['mapbox'] = baseLayers.find((element) => element.options.id === 'mapbox')
-      // baseMaps['google-satellite-only'] = baseLayers.find((element) => element.options.id === 'google-satellite-only')
-
-
       const baseLayerLocal = ref(JSON.parse(JSON.stringify(props.baseLayer)))
       const tileLayerSelected = ref(null) // { id, url, attibutions }
 
@@ -376,23 +321,7 @@
 
       // Change base layer
       const onBaseLayerChange = (baseLayer = 'openstreetmap') => {
-
-        // Remove last (If map ready)
-        if (tileLayerSelected.value) {
-          const removeLayer = baseLayers.find((element) => element.options.id === tileLayerSelected.value.id)
-          if (removeLayer && map.value) {
-            map.value.removeLayer(removeLayer);
-          }
-        }
         tileLayerSelected.value = tileLayerOptions.find(item => item.id === baseLayer)
-
-        // baseMaps[tileLayerSelected.value.id].addTo(map.value);
-        if (tileLayerSelected.value) {
-          const addLayer = baseLayers.find((element) => element.options.id === tileLayerSelected.value.id)
-          if (addLayer && map.value) {
-            map.value.addLayer(addLayer);
-          }
-        }
       }
       onBaseLayerChange(baseLayerLocal.value)
       // <<<
@@ -404,23 +333,14 @@
         forecastSelected.value = forecast;
       }
 
-      // const selectedPMForecastPopUp = ref(null)
-
       // On click feature
-      // eslint-disable-next-line no-unused-vars
       const onFeatureClick = (feature) => {
-        // debugger
-        // const pixel = event.pixel || [event.layerX, event.layerY]
-        // var feature = await map.value.forEachFeatureAtPixel(pixel, function(feature) {
-        //   return feature;
-        // })
         if (feature) {
-          // const properties = feature.getProperties()
           showForecast(feature?.properties?.data?.forecast)
 
           // Indicamos la coordenada donde mostraremos un círculo (Vers tags arriba)
           if (feature?.geometry?.coordinates) {
-            layerSelectedPoint.value = getCenterCoordinateOfPoligone(feature.geometry.coordinates)
+            layerSelectedPoint.value = reverseCoord(getCenterCoordinateOfPoligone(feature.geometry.coordinates))
           }
         } else {
           if (forecastMinimize.value) {
@@ -428,70 +348,32 @@
           }
         }
       }
-      const onMapCenterUpdate = (center) => {
-        mapCenter.value = center;
-      }
-      const onMapZoomUpdate = () => {
-        mapZoom.value = map.value.getZoom()
-      }
-      const onMapRotationUpdate = () => {
-        mapRotation.value = map.value.getBearing()
-      }
+
       const onMapZoomControl = (zoomDelta) => {
-        const newZoom = map.value.getZoom() + zoomDelta
-        map.value.flyTo(mapCenter.value, newZoom, {
+        const newZoom = map.value.mapObject.getZoom() + zoomDelta
+        map.value.mapObject.flyTo(mapCenter.value, newZoom, {
           animate: true,
           duration: 1.5
         });
       }
-      const onMapRotateReset = () => {
-        map.value.setBearing(0)
-      }
-      // Set rotation increment (Only test)
-      const onMapRotateControl = (rotateDelta) => {
-        mapRotation.value = map.value.getBearing() + rotateDelta
-
-        map.value.setBearing(mapRotation.value)
-      }
 
 
       /* --- Map --- */
+      // eslint-disable-next-line no-unused-vars
       var arrow = L.divIcon({
         html: '<div class="arrow"><span></span><span></span><span></span></div>',
         iconSize: [50, 50],
         className: 'my-arrow'
       });
+      // const chartBarGaugeRef = ref(null)
 
       // Forecast
-      const getForecastStyle = (forecast) => {
-        let toxAForecastColor
-        let analisisColor
+      const {
+        getForecastStyle,
+        featureHoverStyle,
+        getPMIStyle,
+      } = useForecastLeafLet()
 
-        if (forecast) {
-          forecast?.forecastItemHeader?.forecastHeader?.forecastBuckets.map((forecastBucket) => {
-            if (forecastBucket.name === 'ToxA-Forecast') {
-              toxAForecastColor = forecastBucket.color
-            }
-            if (forecastBucket.name === 'Analisis') {
-              analisisColor = forecastBucket.color
-            }
-          })
-        }
-        return {
-          fillColor: toxAForecastColor || '#3388ff',
-          color: analisisColor || '#fff8eb',
-          weight: 3,
-          opacity: 1,
-          fillOpacity: 0.8,
-        }
-      }
-      const featureHoverStyle = {
-        //fillColor: '#a7c5f8',
-        //color: '#448aff',
-        fillColor: '#bdcdc7',
-        color: '#016836',
-        weight: 2,
-      }
       const getGeojsonStylePOL = (feature) => {
         return getForecastStyle(feature?.properties?.data?.forecast)
       }
@@ -513,153 +395,65 @@
         layer.on('mouseover', (event) => {
           console.log(event)
           layer.setStyle(featureHoverStyle);
-
-          // selectedPMForecast.value = properties?.data?.forecast
-
-          // selectedPMForecastPopUp.value = L.popup()
-          //   .setLatLng(event.latlng)
-          //   .setContent('<p>Hello world!<br />This is a nice popup.</p>')
-          //   .openOn(map.value);
         });
         layer.on('mouseout', (event) => {
           console.log(event)
           layer.setStyle(getForecastStyle(event?.target?.feature?.properties?.data?.forecast));
-
-          //
-          // selectedPMForecastPopUp.value = null
         });
-
-        // Podríamos indicar el id de la feature para acceder a ella pero
-        // layer._leaflet_id = feature?.properties.name;
       }
 
-      // POL (Features)
+      // PMI
       // debugger
-      var myGeoJsonLayerGroup = null;
-      var myFeaturesMap = {};
-
-      function addNewFeatureToGeoJsonLayerGroup(newGeoJsonData) {
-        var newGeoJSONfeature = L.geoJson(newGeoJsonData, { style: getGeojsonStylePOL, onEachFeature: onEachFeaturePOL });
-        myFeaturesMap[newGeoJsonData.properties.name] = newGeoJSONfeature;
-        myGeoJsonLayerGroup.addLayer(newGeoJSONfeature);
+      const onPointToLayer = (feature, latlng) => {
+        return new L.Circle(latlng, 250, getPMIStyle(feature));
+        // return L.marker(latlng)
+        // if (feature.properties.radius) {
+        // } else {
+        //   return new L.Marker(latlng);
+        // }
       }
 
-      // eslint-disable-next-line no-unused-vars
-      function updateFeature(forecast) {
-        // debugger
-        //const pmId = forecast.forecastItemHeader.forecastHeader.pm.id
-        const pmName = forecast.forecastItemHeader.forecastHeader.pm.poligono
 
-        // var feature = geojsonLayer.getLayer(12345); //your feature id here
-        // alert(feature.feature.id);
-
-        var updatedFeature = myFeaturesMap[pmName];
-        if (updatedFeature && updatedFeature.getLayers()[0]) {
-          let featureLayer = updatedFeature.getLayers()[0]
-
-          // Update Properties
-          const properties = featureLayer.feature.properties
-          if (!properties.data) {
-            properties.data = { }
-          }
-          properties.data.forecast = forecast
-
-          // Set
-          featureLayer.feature.properties = properties
-          featureLayer.setStyle(getGeojsonStylePOL(featureLayer.feature))
-
-
-          // Update
-          updatedFeature.clearLayers(); // Remove the previously created layer.
-          // updatedFeature.addData(feature); // Replace it by the new data.
-          updatedFeature.addLayer(featureLayer)
-        }
-      }
-
-      // eslint-disable-next-line no-unused-vars
-      function deleteFeature(deletedGeoJsonData) {
-        var deletedFeature = myFeaturesMap[deletedGeoJsonData.properties.name];
-        myGeoJsonLayerGroup.removeLayer(deletedFeature);
-      }
-
-      // Initial load
-      const loadGeojson = () => {
-        myGeoJsonLayerGroup = L.geoJson().addTo(map.value);
-        myFeaturesMap = {}
-        vectorLayerGeojsonPOL.value.map((item) => {
-          addNewFeatureToGeoJsonLayerGroup(item)
-        })
-      }
-
+      const chartBarGaugeRef = ref(null)
 
       const setupLeafletMap = () => {
 
-        map.value = L.map("map",{
-          // Standar options
-          // zoomSnap: 0.25, // Ahora usamos el pugin SmoothWheelZoom
-          zoomControl: false,
-          // layers: baseLayers, // [L.tileLayer]
-
-          // Plugin SmoothZoom
-          // smoothZoom: true,
-          // smoothZoomDelay: 1500, //Default to 1000
-          // Plugin SmoothWheelZoom
-          scrollWheelZoom: false, // disable original zoom function
-          smoothWheelZoom: true,  // enable smooth zoom
-          smoothSensitivity: 2,   // zoom speed. default is 1
-
-          // Plugin Rotate (Ver RotateDist)
-          // rotate: true,                 // Activate rotation
-          // bearing: mapRotation.value,   // Set default rotation
-          // touchRotate: true,            // ??
-          // rotateControl: {              // Paint rotate control (Deshabilitamos)
-          //   closeOnZeroBearing: false,
-          //   // position: 'bottomleft',  // Si no indicamos se oculta
-          // },
-        }).setView(mapCenter.value, mapZoom.value);
-
         // map.value.addEventListener('click', onFeatureClick, false) // Este click se define en onEachFeature
-        map.value.on("zoom", onMapZoomUpdate)
-        map.value.on("rotate", onMapRotationUpdate)
-        map.value.on('moveend', () => {
-          const center = map.value.getCenter();
-          onMapCenterUpdate([center.lat, center.lng])
-        });
+        // map.value.on("zoom", onMapZoomUpdate)
+        // map.value.on("rotate", onMapRotationUpdate)
+        // map.value.on('moveend', () => {
+        //   const center = map.value.mapObject.getCenter();
+        //   onMapCenterUpdate([center.lat, center.lng])
+        // });
 
         // debugger
-        if (tileLayerSelected.value) {
-          const addLayer = baseLayers.find((element) => element.options.id === tileLayerSelected.value.id)
-          if (addLayer) {
-            map.value.addLayer(addLayer);
+        // L.marker(mapCenter.value, { icon: arrow }).addTo(map.value.mapObject);
+        // loadGeojson()
+
+        // debugger
+        var gaugeIcon = L.divIcon({
+          html: chartBarGaugeRef.value.$el,
+          iconSize: [32, 32],
+          className: 'my-arrow'
+        });
+        // debugger
+        L.marker(mapCenter.value, { icon: gaugeIcon }).addTo(map.value.mapObject);
+        vectorLayerGeojsonPOL.value.map( (feature) => {
+          var coordinate = reverseCoord(getCenterCoordinateOfPoligone(feature.geometry.coordinates))
+          if (coordinate) {
+            L.marker(coordinate, { icon: arrow }).addTo(map.value.mapObject)
           }
-        }
-
-        L.marker(mapCenter.value, { icon: arrow }).addTo(map.value);
-
-        loadGeojson()
+        })
       }
 
       onMounted( () => {
         setupLeafletMap()
       })
 
-      // zoomUpdate: updates a data property with the current zoom level dynamically
-      // also changes the visibility of building or room labels based on zoom level
-      // watch(() => mapRotation.value, () => {})
-      watch(() => mapZoom.value, () => {
-        setUserMapZoom(mapZoom.value)
-      })
-      watch(() => mapCenter.value, () => {
-        setUserMapCenter(mapCenter.value)
-      })
-      watch(() => mapRotation.value, () => {
-        setUserMapRotation(mapRotation.value)
-      })
-
       // coordinate: [Lat, Lng]
       const goToSpot = (coordinate = [0, 0]) => {
 
-        map.value.flyTo(coordinate, 12.5, {
+        map.value.mapObject.flyTo(coordinate, 12.5, {
           animate: true,
           duration: 1.5
         });
@@ -672,41 +466,30 @@
       // Called from the Home component when a room is searched,
       // this method handles changing the floor level, then pans and zooms to the desired location
       const layerSelectedPoint = ref(null)
-      const getCenterCoordinateOfPoligone = (coordinates) => {
+      const { getCenterCoordinateOfPoligone, reverseCoord } = useUtilsMap()
+      const goProductionZone = (pmName) => {
+        const selectedPM = vectorLayerGeojsonPOL.value.find((feature) => (feature.properties.name === pmName))
+        if (selectedPM) {
+          if (selectedPM?.properties?.data?.forecast) {
+            showForecast(selectedPM?.properties?.data?.forecast)
+          }
 
-        // Create a latLng coordinate at the requested polygon
-        var poly = turfHelper.polygon(coordinates, { name: 'poly'});
-        var center = turf.centerOfMass(poly);
-        var coordinate = [center.geometry.coordinates[0], center.geometry.coordinates[1]]
+          // Create a LatLng coordinate at the requested polygon (Ojo que los GeoJson usan LngLat)
+          var coordinate = reverseCoord(getCenterCoordinateOfPoligone(selectedPM.geometry.coordinates))
+          if (coordinate) {
+            // Indicamos la coordenada donde mostraremos un círculo (Vers tags arriba)
+            layerSelectedPoint.value = coordinate
 
-        return coordinate
-      }
-      const goProductionZone = (productionZoneGeojson) => {
-
-        // TODO - productionZoneGeojson no ha sido actualizado por lo que no tiene todo el data
-        // const properties = feature.getProperties()
-        if (productionZoneGeojson?.properties?.data?.forecast) {
-          showForecast(productionZoneGeojson?.properties?.data?.forecast)
+            // Pan to the location of the coordinatex
+            goToSpot(coordinate)
+          }
         }
-
-        // Create a latLng coordinate at the requested polygon
-        // var poly = turfHelper.polygon(productionZoneGeojson.geometry.coordinates, { name: 'poly'});
-        // var center = turf.centerOfMass(poly);
-        // var coordinate = [center.geometry.coordinates[0], center.geometry.coordinates[1]]
-        var coordinate = getCenterCoordinateOfPoligone(productionZoneGeojson.geometry.coordinates)
-
-        // Indicamos la coordenada donde mostraremos un círculo (Vers tags arriba)
-        layerSelectedPoint.value = coordinate
-
-        // Pan to the location of the coordinatex
-        // currentCenter.value = coordinate
-        goToSpot(coordinate)
       }
+
 
       /* --- Forecast --- */
       const loading = ref(false)
 
-      // eslint-disable-next-line no-unused-vars
       const overWriteForecastData = ( forecast ) => {
         const pmId = forecast.forecastItemHeader.forecastHeader.pm.id
         const pmName = forecast.forecastItemHeader.forecastHeader.pm.poligono
@@ -727,6 +510,10 @@
         })
       }
       const onLoadForecast = (riaId) => {
+
+        // .get('http://localhost:8050/public/forecast?pmId=1&dateRef=1-08-2022')
+        // .get('http://localhost:8050/public/forecast?riaId=5&dateRef=1-08-2022')
+        // .get(`${API_BASE}/public/forecast?riaId=5&dateRef=1-08-2022`)
         // const url = `${API_BASE}/public/forecast?riaId=5&dateRef=${dateRef.value}$toxinType=${toxinTypeSelected.value}`
         const params = {
           riaId: riaId,
@@ -739,16 +526,13 @@
         // debugger
         // loading.value = true;
         axios
-          // .get('http://localhost:8050/public/forecast?pmId=1&dateRef=1-08-2022')
-          // .get('http://localhost:8050/public/forecast?riaId=5&dateRef=1-08-2022')
-          // .get(`${API_BASE}/public/forecast?riaId=5&dateRef=1-08-2022`)
           .get(url)
           .then(response => {
             console.log(response)
             if (response?.data?.forecasts) {
               response?.data.forecasts.map((forecast) => {
-                // overWriteForecastData(forecast)
-                updateFeature(forecast)
+                overWriteForecastData(forecast)
+                // updateFeature(forecast)
               })
             }
           })
@@ -766,19 +550,16 @@
           loading.value = false;
         })
       }
-      // onLoadForecast(5)
       loadForecastAll([2,4,5,6])
 
       // Toolbox options
       const isPOLOpen = ref(false)
 
       return {
+        chartBarGaugeRef,
         // Mapbox tools (Layer, Map zoom +/-)
         baseLayerLocal,
         onMapZoomControl, // Map zoom +/-
-        onMapRotateReset,   // Rotation reset: North (0º)
-        onMapRotateControl, // Rotation control
-        mapRotation,        // Rotation set icon rotation
 
         // Toolbox options
         isPOLOpen,
@@ -790,21 +571,30 @@
         // DateRef
         dateRef,
         dateRefFormatted, // Computed DateRef with format
-        setDatePrev,
-        setDateNext,
 
         // Map
         map,
-        // mapProjection,
-        // mapRotation,
-        // mapCenter,
-        // mapZoom,
-        // Map functions
-        // mapZoomUpdate: setUserMapZoom,
-        // mapCenterUpdate: setUserMapCenter,
+        mapCenter,
+        mapZoom,
+
         // Map external FM's
         goMapHome,
         goProductionZone,
+
+        // Tile
+        tileLayerSelected,
+
+        // Geojson (POL)
+        vectorLayerGeojsonPOL,
+        getGeojsonStylePOL,
+        onEachFeaturePOL,
+
+        // Geojson (PMI)
+        vectorLayerGeojsonPMI,
+        onPointToLayer,
+
+        // Selected Point
+        layerSelectedPoint,
 
         // Forecast
         loading,
