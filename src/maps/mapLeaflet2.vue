@@ -431,19 +431,19 @@ l<template>
         // loadGeojson()
 
         // debugger
-        var gaugeIcon = L.divIcon({
-          html: chartBarGaugeRef.value.$el,
-          iconSize: [32, 32],
-          className: 'my-arrow'
-        });
+        // var gaugeIcon = L.divIcon({
+        //   html: chartBarGaugeRef.value.$el,
+        //   iconSize: [32, 32],
+        //   className: 'my-arrow'
+        // });
         // debugger
-        L.marker(mapCenter.value, { icon: gaugeIcon }).addTo(map.value.mapObject);
-        vectorLayerGeojsonPOL.value.map( (feature) => {
-          var coordinate = reverseCoord(getCenterCoordinateOfPoligone(feature.geometry.coordinates))
-          if (coordinate) {
-            L.marker(coordinate, { icon: arrow }).addTo(map.value.mapObject)
-          }
-        })
+        // L.marker(mapCenter.value, { icon: gaugeIcon }).addTo(map.value.mapObject);
+        // vectorLayerGeojsonPOL.value.map( (feature) => {
+        //   var coordinate = reverseCoord(getCenterCoordinateOfPoligone(feature.geometry.coordinates))
+        //   if (coordinate) {
+        //     L.marker(coordinate, { icon: arrow }).addTo(map.value.mapObject)
+        //   }
+        // })
       }
 
       onMounted( () => {
