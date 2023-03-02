@@ -189,6 +189,12 @@ l<template>
             :geojson="vectorLayerGeojsonPMI"
             :options="{ pointToLayer: onPointToLayer }"
           ></l-geo-json>
+
+          <l-geo-json
+            v-if="showLayerPMI"
+            :geojson="vectorLayerGeojsonPMI"
+            :options="{ pointToLayer: onPointToLayerIcon }"
+          ></l-geo-json>
         </l-layer-group>
       </l-map>
 
@@ -413,6 +419,10 @@ l<template>
         // }
       }
 
+      const onPointToLayerIcon = (feature, latlng) => {
+        return L.marker(latlng, { icon: arrow }).addTo(map.value.mapObject)
+      }
+
 
       const chartBarGaugeRef = ref(null)
 
@@ -592,6 +602,7 @@ l<template>
         // Geojson (PMI)
         vectorLayerGeojsonPMI,
         onPointToLayer,
+        onPointToLayerIcon,
 
         // Selected Point
         layerSelectedPoint,
