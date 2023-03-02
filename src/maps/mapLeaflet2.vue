@@ -1,5 +1,25 @@
 l<template>
   <div>
+
+    <!-- Render all icons -->
+    <div ref="chartBarGaugeRef" class="d-flex w-100" v-if="showLayerPOL">
+      <!-- <ChartBarGauge
+        v-for="(feature, index) in vectorLayerGeojsonPOLForecast"
+        :key="index"
+        :id="feature.properties.name"
+        :forecast="feature.properties.data.forecast"
+        style="max-width: 32px;"
+      >
+      </ChartBarGauge> -->
+      <!-- v-if="showLayerPOL" -->
+      <!-- :geojson="vectorLayerGeojsonPOL" -->
+    </div>
+    <div class="d-flex w-100" v-if="forecastDefault">
+      <ChartBarGauge :forecast="forecastDefault" style="max-width: 132px;"></ChartBarGauge>
+      <!-- {{ chartRenderizado }} -->
+    </div>
+
+
     <SidebarPOL class="sidebar_pol" :isSidebarActive.sync="isPOLOpen"></SidebarPOL>
 
     <div class="map_container_wrapper" :class="[isPOLOpen ? 'one_sidebar_after' : 'none_sidebar_after']">
@@ -25,7 +45,7 @@ l<template>
           >
             <v-icon color="white">mdi-minus</v-icon>
           </v-btn>
-          <v-btn
+          <!-- <v-btn
             class="my-1"
             x-small
             fab
@@ -33,7 +53,8 @@ l<template>
             @click="onMapZoomControl(-1)"
           >
             <ChartBarGauge ref="chartBarGaugeRef" style="max-width: 32px;"></ChartBarGauge>
-          </v-btn>
+            <ChartBarGauge ref="chartBarGaugeRefRC" style="max-width: 32px;"></ChartBarGauge>
+          </v-btn> -->
         </div>
       </div>
 
@@ -157,7 +178,7 @@ l<template>
         :center.sync="mapCenter"
         :options="{
           zoomControl: false,
-          attributionControl: false,
+          // attributionControl: false,
           // zoomSnap: true
           // zoomSnap: 0.25,
         }">
@@ -203,12 +224,20 @@ l<template>
 </template>
 
 <script>
-  import { onMounted, ref, watch } from 'vue';
+  import { computed, h, onMounted, ref, watch } from 'vue';
   import axios from 'axios';
 
   // Leaflet
   import "leaflet/dist/leaflet.css";
   import L from "leaflet";
+
+  // Importamos los plugings
+  // import "../plugins/leaflet/MiniChart"
+  // import "leaflet-rain"
+  import "../plugins/leaflet/RainViewer/RainViewer.js"
+  import "../plugins/leaflet/RainViewer/RainViewer.css"
+  // import "https://cdn.jsdelivr.net/gh/mwasil/Leaflet.Rainviewer/leaflet.rainviewer.css"
+
   import { LMap, LTileLayer, LGeoJson, LLayerGroup, LMarker, LTooltip, LCircleMarker } from 'vue2-leaflet'; // Import vue leaflet
 
   // GeoJSON Files (Import before undate from API)
@@ -303,6 +332,15 @@ l<template>
       //  EPSG 3857 google Earth
       const vectorLayerGeojsonPOL = ref(geojsonDataPOL.features)
       const vectorLayerGeojsonPMI = ref(geojsonDataPMI.features)
+      const vectorLayerGeojsonPOLForecast = computed( () => {
+        return vectorLayerGeojsonPOL.value.filter((feature) => {
+          if (feature?.properties?.data?.forecast !== undefined) {
+            return true
+          }
+          return false
+        }
+        )
+      })
 
       // Map (With LeafLet no se puede cambiar mapProjection)
       const map = ref(null)
@@ -383,8 +421,22 @@ l<template>
       const getGeojsonStylePOL = (feature) => {
         return getForecastStyle(feature?.properties?.data?.forecast)
       }
+
       const onEachFeaturePOL = (feature, layer) => {
         var clicked = false
+
+        // let points = [[latlngs], [latlngs], ...],
+        // const options = {
+        //   angle: 80,
+        //   width: 1,
+        //   spacing: 10,
+        //   length: 4,
+        //   interval: 10,
+        //   speed: 1,
+        //   color: 'Oxa6b3e9'
+        // }
+        // const rain = L.rain(feature.geometry.coordinates, options)
+        // rain.addTo(map.value.mapObject)
 
         layer.on('click', (event) => {
           console.log(event)
@@ -409,7 +461,6 @@ l<template>
       }
 
       // PMI
-      // debugger
       const onPointToLayer = (feature, latlng) => {
         return new L.Circle(latlng, 250, getPMIStyle(feature));
         // return L.marker(latlng)
@@ -419,12 +470,61 @@ l<template>
         // }
       }
 
+
+      // debugger
+      const forecastDefault = vectorLayerGeojsonPOL.value.find( (element) => element?.properties?.name === 'Ribeira B')
+      const chartRenderizado = h(ChartBarGauge, { forecast: forecastDefault })
+      // eslint-disable-next-line no-unused-vars
       const onPointToLayerIcon = (feature, latlng) => {
-        return L.marker(latlng, { icon: arrow }).addTo(map.value.mapObject)
+        // if (chartBarGaugeRef.value && chartBarGaugeRef.value.children.length > 0) {
+        //   const gaugeIcon = L.divIcon({
+        //     html: chartBarGaugeRef.value.children[0].__vue__.$el,
+        //     iconSize: [32, 32],
+        //     className: 'my-arrow--'
+        //   });
+        //   return L.marker(latlng, { icon: gaugeIcon }).addTo(map.value.mapObject)
+        // }
+        // if (feature.properties.name === 'A0') {
+        //   const gaugeIcon = L.divIcon({
+        //     html: chartBarGaugeRef.value.$el,
+        //     iconSize: [32, 32],
+        //     className: 'my-arrow--'
+        //   });
+        //   return L.marker(latlng, { icon: gaugeIcon }).addTo(map.value.mapObject)
+        // }
+        // if (feature.properties.name === 'A1') {
+        //   const gaugeIcon = L.divIcon({
+        //     html: chartBarGaugeRefRC.value.$el,
+        //     iconSize: [32, 32],
+        //     className: 'my-arrow--'
+        //   });
+        //   return L.marker(latlng, { icon: gaugeIcon }).addTo(map.value.mapObject)
+        // }
+        // return
+
+        // const vnode = h('div', { id: 'foo' }, [])
+        // const vnode = h('span', 'hello')
+        // // const render = h(ChartBarGauge, { forecast: forecastDefault })
+        // const gaugeIcon = L.divIcon({
+        //   html: vnode,
+        //   iconSize: [32, 32],
+        //   className: 'my-arrow--'
+        // });
+        // return L.marker(latlng, { icon: gaugeIcon }).addTo(map.value.mapObject)
+
+        // return L.minichart(latlng, { data: [Math.random(), Math.random(), Math.random()] });
+        // return L.Marker(latlng, { icon: L.DivIcon.SVGIcon() })
+        // return L.marker.svgMarker(latlng)
+        // return L.Marker.SVGMarker(latlng, options)
+
+        // debugger
+        // L.marker(latlng, { icon: arrow }).addTo(map.value.mapObject);
+        // L.marker(mapCenter.value, { icon: gaugeIcon }).addTo(map.value.mapObject);
       }
 
-
+      // debugger
       const chartBarGaugeRef = ref(null)
+      const chartBarGaugeRefRC = ref(null)
 
       const setupLeafletMap = () => {
 
@@ -454,6 +554,21 @@ l<template>
         //     L.marker(coordinate, { icon: arrow }).addTo(map.value.mapObject)
         //   }
         // })
+
+        // var overlay = new L.echartsLayer3(map, echarts);
+
+        // Rain
+        var rainviewer = L.control.rainviewer({
+          position: 'topleft',
+          nextButtonText: '>',
+          playStopButtonText: 'Start/Stop',
+          prevButtonText: '<',
+          positionSliderLabelText: "Time:",
+          opacitySliderLabelText: "Opacity:",
+          animationInterval: 500,
+          opacity: 0.5
+        });
+        rainviewer.addTo(map.value.mapObject);
       }
 
       onMounted( () => {
@@ -567,6 +682,11 @@ l<template>
 
       return {
         chartBarGaugeRef,
+        chartBarGaugeRefRC,
+        vectorLayerGeojsonPOLForecast,
+        forecastDefault,
+        chartRenderizado,
+
         // Mapbox tools (Layer, Map zoom +/-)
         baseLayerLocal,
         onMapZoomControl, // Map zoom +/-

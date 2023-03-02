@@ -15,7 +15,7 @@
     </v-dialog>
 
     <!-------------------------- Search Bar ----------------------->
-    <div id="custom-toolbar">
+    <div id="custom-toolbar" style="display: none;">
       <div id="custom-search-wrapper" class="d-flex align-center">
 
         <!-- Menu button -->
