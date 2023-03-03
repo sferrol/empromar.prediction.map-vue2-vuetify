@@ -236,7 +236,12 @@ l<template>
   // import "leaflet-rain"
   import "../plugins/leaflet/RainViewer/RainViewer.js"
   import "../plugins/leaflet/RainViewer/RainViewer.css"
-  // import "https://cdn.jsdelivr.net/gh/mwasil/Leaflet.Rainviewer/leaflet.rainviewer.css"
+
+  // import "leaflet-particles" // Like windy particles
+  import "leaflet-particles/src/js/L.ParticlesLayer" // Like windy particles
+
+  import "../plugins/leaflet/Velocity/leaflet-velocity.css"
+  import "../plugins/leaflet/Velocity/leaflet-velocity.js"
 
   import { LMap, LTileLayer, LGeoJson, LLayerGroup, LMarker, LTooltip, LCircleMarker } from 'vue2-leaflet'; // Import vue leaflet
 
@@ -244,6 +249,11 @@ l<template>
   //  Ojo que las coordendas en un Geojson se indican LonLat
   import geojsonDataPOL from '../geojson/POL.json'; // Import vectorLayerGeojsonPOL GeoJSON (LonLat)
   import geojsonDataPMI from '../geojson/PMI.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
+
+  // Import
+  import geojsonDataWindGlobal from '../geojson/Velocity/wind-global.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
+  import geojsonDataWindGBR from '../geojson/Velocity/wind-gbr'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
+  import geojsonDataWaterGBR from '../geojson/Velocity/water-gbr'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
 
   // DateRef + MapCenter + MapZoom + MapRotation
   import useMap from '@/service/useMap';
@@ -526,6 +536,178 @@ l<template>
       const chartBarGaugeRef = ref(null)
       const chartBarGaugeRefRC = ref(null)
 
+      // eslint-disable-next-line no-unused-vars
+      const leatletVelocity = () => {
+
+        // debugger
+        // $.getJSON("wind-global.json", function(data) {
+        var windLayer = L.velocityLayer({
+          displayValues: true,
+          displayOptions: {
+            velocityType: "Global Wind",
+            position: "bottomleft",
+            emptyString: "No wind data"
+          },
+          data: geojsonDataWindGlobal,
+          maxVelocity: 15
+        });
+
+        var windGBRLayer = L.velocityLayer({
+          displayValues: true,
+          displayOptions: {
+            velocityType: "GBR Wind",
+            position: "bottomleft",
+            emptyString: "No wind data",
+            showCardinal: true
+          },
+          data: geojsonDataWindGBR,
+          maxVelocity: 10
+        });
+
+        var waterGBRLayer = L.velocityLayer({
+          displayValues: true,
+          displayOptions: {
+            velocityType: "GBR Water",
+            position: "bottomleft",
+            emptyString: "No water data"
+          },
+          data: geojsonDataWaterGBR,
+          maxVelocity: 0.6,
+          velocityScale: 0.1 // arbitrary default 0.005
+        });
+
+        const layerControl = L.control.layers({}, {
+          wind: windLayer,
+          windGBR: windGBRLayer,
+          waterGBR: waterGBRLayer,
+        });
+        layerControl.addTo(map.value.mapObject);
+        // map.value.mapObject.addLayer(velocityLayer)
+      }
+      const leafletParticle = () => {
+        // debugger
+        // eslint-disable-next-line no-unused-vars
+        const index = 0
+
+        // { lat: 42.51994, lng: -8.93902 }
+        const data = {
+          "2023-03-03T18:00:00.000Z": [
+            [
+              6,        // particle id
+              -8.93902, // lon
+              42.51994, // lat
+              0.5,      // depth (m)
+              1.0       // age
+            ],
+          ]
+        }
+
+        // create a particle layer
+        const mode = 'FINAL';
+        const particleLayer = L.particlesLayer({
+
+          // an array of keyframes, default: null
+          data: data,
+
+          pane: 'overlayPane', // name of an existing leaflet pane to add the layer to, default: 'overlayPane'
+
+          // define the indices of your data point arrays, default:
+          dataFormat: {
+            idIndex:    0,
+            lonIndex:   1,
+            latIndex:   2,
+            depthIndex: 3,
+            ageIndex:   4
+          },
+
+          // one of: 'FINAL', 'EXPOSURE', 'KEYFRAME', default: null
+          displayMode: mode,
+
+          // which keyframe should display on init, default: 0
+          startFrameIndex: 0,
+
+          // the colors to use in chroma-js scale, default: (shown below)
+          ageColorScale: ['green', 'yellow', 'red'],
+
+          // the domain to fit the ageColorScale, default: keyframe length
+          ageDomain: [0, 100],
+
+          // heatmap.js options for heatmap layers, see:
+          // https://www.patrick-wied.at/static/heatmapjs/example-heatmap-leaflet.html
+          // note that additionally; we have an enhanced version of the leaflet-heatmap.js plugin (see /src)
+          // that provides advanced cell/radius options, see: https://github.com/danwild/leaflet-heatbin
+          heatOptions: {
+
+            // example fixed radius of 1000m
+            fixedRadius: true,
+            radiusMeters: 1000,
+
+            // e.g. bin values into 250m grid cells
+            heatBin: {
+              enabled: true,
+              cellSizeKm: 0.25
+            }
+          },
+
+          // the intensity value to use for each point on the heatmap, default: 1
+          // only used if not heatBin.enabled
+          exposureIntensity: 1,
+          finalIntensity: 1,
+
+          // callbacks when layer is added/removed from map
+          onAdd: () => {},
+          onRemove: () => {}
+        });
+
+        // add the layer to overlay control
+        // const layerControl = L.control.layers({}, { particles: particleLayer });
+        // layerControl.addTo(map.value.mapObject);
+
+        // Activar directamente
+        map.value.mapObject.addLayer(particleLayer)
+
+        // data and display mode can be updated like:
+        // debugger
+        particleLayer.setData(data)
+        particleLayer.setDisplayMode('KEYFRAME')
+
+        // when in keyframe mode, set active frame like:
+        particleLayer.setFrameIndex(index)
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const rainWieverControl = () => {
+        // Rain
+        var rainviewer = L.control.rainviewer({
+          position: 'topleft',
+          nextButtonText: '>',
+          playStopButtonText: 'Start/Stop',
+          prevButtonText: '<',
+          positionSliderLabelText: "Time:",
+          opacitySliderLabelText: "Opacity:",
+          animationInterval: 500,
+          opacity: 0.5
+        });
+        rainviewer.addTo(map.value.mapObject);
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const rainWieverFija = () => {
+        // https://tilecache.rainviewer.com/v2/radar/1677846600/512/10/485/378/4/1_1.png
+        // https://tilecache.rainviewer.com/v2/radar/1677847200/512/11/972/758/4/1_1.png
+        // https://tilecache.rainviewer.com/v2/radar/1677846600/512/12/972/758/4/1_1.png
+
+        // https://tilecache.rainviewer.com/v2/radar/1677847200/256/11/972/758/2/1_1.png
+        const ts = 1677847200
+        const rainLayer = new L.TileLayer(`https://tilecache.rainviewer.com/v2/radar/${ts}/256/{z}/{x}/{y}/2/1_1.png`, {
+          tileSize: 256,
+          opacity: 1,
+          transparent: false,
+          attribution: '<a href="https://rainviewer.com" target="_blank">rainnviewer.com</a>',
+          zIndex: ts
+        })
+        map.value.mapObject.addLayer(rainLayer)
+      }
       const setupLeafletMap = () => {
 
         // map.value.addEventListener('click', onFeatureClick, false) // Este click se define en onEachFeature
@@ -537,7 +719,7 @@ l<template>
         // });
 
         // debugger
-        // L.marker(mapCenter.value, { icon: arrow }).addTo(map.value.mapObject);
+        L.marker(mapCenter.value, { icon: arrow }).addTo(map.value.mapObject);
         // loadGeojson()
 
         // debugger
@@ -557,18 +739,11 @@ l<template>
 
         // var overlay = new L.echartsLayer3(map, echarts);
 
-        // Rain
-        var rainviewer = L.control.rainviewer({
-          position: 'topleft',
-          nextButtonText: '>',
-          playStopButtonText: 'Start/Stop',
-          prevButtonText: '<',
-          positionSliderLabelText: "Time:",
-          opacitySliderLabelText: "Opacity:",
-          animationInterval: 500,
-          opacity: 0.5
-        });
-        rainviewer.addTo(map.value.mapObject);
+
+        // rainWieverControl()
+        // rainWieverFija()
+        leafletParticle()
+        leatletVelocity()
       }
 
       onMounted( () => {

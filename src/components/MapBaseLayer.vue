@@ -79,7 +79,7 @@
 
       // >>> Base layer selection
       const { tileLayerOptions } = useMap();
-      const baseLayerOptions = ['openstreetmap', 'mapbox', 'google-satellite-only'].map((key) => {
+      const baseLayerOptions = ['openstreetmap', 'mapbox', 'windy', 'google-satellite-only'].map((key) => {
         const tileLayer = tileLayerOptions.find((element) => element.id === key);
         return {
           value: tileLayer?.id || key,

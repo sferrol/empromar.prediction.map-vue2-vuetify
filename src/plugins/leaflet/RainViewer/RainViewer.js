@@ -14,7 +14,7 @@ L.Control.Rainviewer = L.Control.extend({
   },
 
   onAdd: function (map) {
-    debugger
+    // debugger
     /**
        * RainViewer radar animation part
        * @type {number[]}
@@ -46,7 +46,7 @@ L.Control.Rainviewer = L.Control.extend({
 
   // eslint-disable-next-line no-unused-vars
   load: function(map) {
-    debugger
+    // debugger
     /**
        * Load actual radar animation frames this.timestamps from RainViewer API
        */

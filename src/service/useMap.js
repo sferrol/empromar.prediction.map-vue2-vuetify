@@ -27,6 +27,21 @@ export default function useMap() {
       text: 'OS'
     },
     {
+      id: 'windy',
+      url: 'http://{s}.sm.mapstack.stamen.com/(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/{z}/{x}/{y}.png',
+      url1: 'https://tiles.windy.com/tiles/v9.0/grayland/{z}/{x}/{y}.png',
+      attribution: '&copy; Windy',
+      icon: 'mdi-weather-windy',
+      text: 'Windy'
+    },
+    {
+      id: 'windy-zoom-12+',
+      url: 'https://windytiles.mapy.cz/turist-en/{z}-{x}-{y}',
+      attribution: '&copy; Windy',
+      icon: 'mdi-weather-windy',
+      text: 'Windy'
+    },
+    {
       id: 'mapbox',
       url: 'https://api.mapbox.com/styles/v1/parksideindoor/cki8uc2193zu919qv2uhe53dk/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoicGFya3NpZGVpbmRvb3IiLCJhIjoiY2tnaGU1MHowMDN0czJ6bWU1ajVoeTlneCJ9.KfnSk61OsHyGuvWLn3M6bA',
       attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
