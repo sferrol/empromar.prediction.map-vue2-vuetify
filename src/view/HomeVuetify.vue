@@ -189,7 +189,7 @@
     <!-- <MapComponent/> -->
 
     <!-- Play -->
-    <ForecastPlay class="map-play"/>
+    <!-- <ForecastPlay class="map-play"/> -->
 
     <!-- Tools -->
     <ForecastLeyend class="map-tools"/>

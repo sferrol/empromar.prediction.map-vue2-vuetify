@@ -1,4 +1,4 @@
-l<template>
+<template>
   <div>
 
     <!-- Render all icons -->
@@ -14,11 +14,10 @@ l<template>
       <!-- v-if="showLayerPOL" -->
       <!-- :geojson="vectorLayerGeojsonPOL" -->
     </div>
-    <div class="d-flex w-100" v-if="forecastDefault">
+    <!-- {{ chartRenderizado }} -->
+    <!-- <div class="d-flex w-100" v-if="forecastDefault">
       <ChartBarGauge :forecast="forecastDefault" style="max-width: 132px;"></ChartBarGauge>
-      <!-- {{ chartRenderizado }} -->
-    </div>
-
+    </div> -->
 
     <SidebarPOL class="sidebar_pol" :isSidebarActive.sync="isPOLOpen"></SidebarPOL>
 
@@ -102,7 +101,8 @@ l<template>
       </div>
 
       <!-- Date: Prev + Date + Next [Mismo estilo que el toolbar]-->
-      <div class="data-ref-wrapper" :class="[ $vuetify.breakpoint.xs ? 'data-ref-wrapper-bottom' : 'data-ref-wrapper-top' ]">
+      <!-- <div class="data-ref-wrapper" :class="[ $vuetify.breakpoint.xs ? 'data-ref-wrapper-bottom' : 'data-ref-wrapper-top' ]"> -->
+      <div class="forecast-animation">
         <div class="d-flex align-center" style="height: 56px;">
 
           <!-- v-model="modal" -->
@@ -137,6 +137,51 @@ l<template>
               @input="$refs.dialog.save(dateRef)"
             />
           </v-dialog>
+
+          <!-- Play / Pause -->
+          <v-btn
+            :color="animationTimer ? 'secondary' : 'primary'"
+            x-small
+            depressed
+            fab
+            @click="startstop"
+          >
+            <v-icon>
+              {{ animationTimer ? 'mdi-pause' : 'mdi-play' }}
+            </v-icon>
+          </v-btn>
+
+          <!-- Slider -->
+          <!-- :thumb-size="24" -->
+          <v-slider
+            class="mr-1"
+            dense
+            v-model="animationPosition"
+            :min="animationPositionMin"
+            :max="animationPositionMax"
+            thumb-label="always"
+            ticks="always"
+            tick-size="4"
+            hide-details="true"
+            @change="(event) => onChangeAnimationPositionSlider(event)"
+            @click="stop"
+            @start="stop"
+          >
+            <template v-slot:thumb-label="{ value }">
+              Day{{ value }}
+            </template>
+          </v-slider>
+
+          <!-- Velocity -->
+          <v-btn
+            class="mr-1"
+            color="secondary"
+            x-small
+            depressed
+            @click="onChangeAnimationVelocity"
+          >
+            {{ animationVelocity }}x
+          </v-btn>
         </div>
       </div>
 
@@ -183,7 +228,7 @@ l<template>
           // zoomSnap: 0.25,
         }">
 
-        <l-tile-layer :url="tileLayerSelected.url" :options="{ maxNativeZoom:19, maxZoom:21, minZoom:6 }"></l-tile-layer>
+        <l-tile-layer :url="tileLayerSelected.url" :options="{ maxNativeZoom:19, maxZoom:21, minZoom:4 }"></l-tile-layer>
         <!-- <ChartBarGauge></ChartBarGauge> -->
 
         <!-- <l-marker
@@ -242,6 +287,27 @@ l<template>
 
   import "../plugins/leaflet/Velocity/leaflet-velocity.css"
   import "../plugins/leaflet/Velocity/leaflet-velocity.js"
+  // import "../plugins/leaflet/Velocity/src/css/leaflet-velocity.css"
+  // import "../plugins/leaflet/Velocity/src/js/windy.js"
+  // import "../plugins/leaflet/Velocity/src/js/L.CanvasLayer.js"
+  // import "../plugins/leaflet/Velocity/src/js/L.VelocityLayer.js"
+
+  import "../plugins/leaflet/leaflet-heat"
+  // import "http://leaflet.github.io/Leaflet.markercluster/example/realworld.10000.js"
+  // import { addressPoints } from '../geojson/Heat/HeatPoints'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
+
+  // import "../plugins/leaflet/Heatmap/heatmap"
+  import "../plugins/leaflet/Heatmap/leaflet-heatmap"
+
+  // Time Dimensaion
+  // import "../plugins/leaflet/TimeDimension/iso8601.min"
+  // import "../plugins/leaflet/TimeDimension/dist/leaflet.timedimension.control.css"
+  // import "../plugins/leaflet/TimeDimension/dist/leaflet.timedimension.src.js"
+
+  // NetCDF REad
+  // import { readFileSync } from 'fs'
+  // import { NetCDFReader } from 'netcdfjs'
+
 
   import { LMap, LTileLayer, LGeoJson, LLayerGroup, LMarker, LTooltip, LCircleMarker } from 'vue2-leaflet'; // Import vue leaflet
 
@@ -251,6 +317,7 @@ l<template>
   import geojsonDataPMI from '../geojson/PMI.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
 
   // Import
+  import geojsonDataTest from '../geojson/Velocity/test.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
   import geojsonDataWindGlobal from '../geojson/Velocity/wind-global.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
   import geojsonDataWindGBR from '../geojson/Velocity/wind-gbr'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
   import geojsonDataWaterGBR from '../geojson/Velocity/water-gbr'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
@@ -259,6 +326,8 @@ l<template>
   import useMap from '@/service/useMap';
   import useUtilsMap from '@/service/useUtilsMap';
   import useForecastLeafLet from '@/service/useForecastLeafLet';
+
+  import useTimeMap from './useTimeMap';
 
   // Components
   import ForecastCard from '../components/ForecastCardV.vue'
@@ -305,6 +374,14 @@ l<template>
       },
     },
     setup(props) {
+
+      /** TimeMap */
+      const {
+        animationPosition, animationPositionMin, animationPositionMax, onChangeAnimationPositionSlider,
+        onAdd,
+        startstop, animationTimer, stop,
+        animationVelocity, onChangeAnimationVelocity,
+      } = useTimeMap()
 
       /** --- ToxinType --- */
       // ToxinType
@@ -537,9 +614,96 @@ l<template>
       const chartBarGaugeRefRC = ref(null)
 
       // eslint-disable-next-line no-unused-vars
-      const leatletVelocity = () => {
+      const readDensity = (index) => {
+        console.log(index)
+        // debugger
+
+        // fetch('http://leaflet.github.io/Leaflet.markercluster/example/realworld.10000.js')
+        // fetch('/data/test.json')
+        fetch('/data/particles/particles_2017-07-10T00.json')
+          .then(response => response.text())
+          .then(data => {
+            // debugger
+            if (data) {
+              data = JSON.parse(data)
+              // setNCDensity(JSON.parse(data))
+              // const msl = { min: 10000, max: 0, data: [] };
+              // for (let i = 0; i < data.length; i++) {
+              //   msl.data.push({'lat': data[i][0], 'lng': data[i][1], 'value': data[i][2]});
+              //   if (data[i][2] > msl.max) {
+              //     msl.max = data[i][2]
+              //   }
+              //   if (data[i][2] < msl.min) {
+              //     msl.min = data[i][2]
+              //   }
+              // }
+              // setNCDensity(msl)
+
+              const addressPoints2 = data.map((p) => { return [p[0], p[1]] });
+              heatLayer.setLatLngs(addressPoints2)
+            }
+          }
+          )
+          .catch(error => console.error(error))
+      }
+
+      // const setNCDensity = (values) => {
+      //   L.heatLayer(values).addTo(map.value.mapObject);
+      // }
+
+      var heatLayer = null
+      const leafletHeatmap = () => {
 
         // debugger
+        // heatLayer = L.heatLayer([], {radius: 4, blur:1 }).addTo(map.value.mapObject);
+        heatLayer = L.heatLayer([], {radius: 4, blur:1 })
+
+        // L.TimeDimension.Layer
+        // var anyLayer = L.timeDimension.layer(
+        //   heatLayer,
+        //   {
+        //     timeDimension: true,
+        //     timeDimensionOptions: {
+        //       timeInterval: "2014-09-30/2014-10-30",
+        //       period: "PT1H"
+        //     },
+        //     timeDimensionControl: true
+        //   })
+        // anyLayer.addTo(map.value.mapObject);
+
+        readDensity(0)
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const leafletTimeDimension = () => {
+        // Create and add a TimeDimension Layer to the map
+        // var tdWmsLayer = L.timeDimension.layer.wms(wmsLayer);
+        // tdWmsLayer.addTo(map);
+
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const leafletHeat = () => {
+        // debugger
+        // const addressPoints2 = addressPoints.map(function (p) { return [p[0], p[1]]; });
+        // L.heatLayer(addressPoints2).addTo(map.value.mapObject);
+      }
+
+      // eslint-disable-next-line no-unused-vars
+      const leatletVelocity = () => {
+
+        debugger
+        var testLayer = L.velocityLayer({
+          displayValues: true,
+          displayOptions: {
+            velocityType: "Test",
+            position: "bottomleft",
+            emptyString: "No wind data"
+          },
+          data: geojsonDataTest,
+          maxVelocity: 15
+        });
+
         // $.getJSON("wind-global.json", function(data) {
         var windLayer = L.velocityLayer({
           displayValues: true,
@@ -577,6 +741,7 @@ l<template>
         });
 
         const layerControl = L.control.layers({}, {
+          test: testLayer,
           wind: windLayer,
           windGBR: windGBRLayer,
           waterGBR: waterGBRLayer,
@@ -584,6 +749,8 @@ l<template>
         layerControl.addTo(map.value.mapObject);
         // map.value.mapObject.addLayer(velocityLayer)
       }
+
+      // eslint-disable-next-line no-unused-vars
       const leafletParticle = () => {
         // debugger
         // eslint-disable-next-line no-unused-vars
@@ -743,7 +910,14 @@ l<template>
         // rainWieverControl()
         // rainWieverFija()
         leafletParticle()
-        leatletVelocity()
+        // leatletVelocity()
+        leafletHeat()
+        leafletHeatmap()
+
+        // leafletTimeDimension()
+
+        // debugger
+        onAdd(map.value.mapObject)
       }
 
       onMounted( () => {
@@ -906,6 +1080,20 @@ l<template>
         loading,
         forecastSelected,
         forecastMinimize,
+
+        // TimeMap
+        // Slider
+        animationPosition,
+        animationPositionMin,
+        animationPositionMax,
+        onChangeAnimationPositionSlider,
+        // Start-Stop toggle
+        startstop,
+        stop,
+        animationTimer, // isPlay or isPause (Change icons)
+        // Velocity
+        animationVelocity,
+        onChangeAnimationVelocity,
       }
     }
   }
@@ -969,6 +1157,19 @@ l<template>
   .toxin-type-wrapper-bottom {
     bottom: 0;
     right: 10px;
+  }
+
+  /* DataRef Wrapper */
+  .forecast-animation {
+    background: none;
+    z-index: 2;
+
+    position: absolute;
+    bottom: 0;
+    left: 10px;
+
+    width: 100%;
+    padding: 10px;
   }
 
   /* DataRef Wrapper */
