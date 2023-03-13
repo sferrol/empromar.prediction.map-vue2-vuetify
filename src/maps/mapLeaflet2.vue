@@ -335,7 +335,7 @@
   import ForecastTable from '@/components/ForecastTable.vue';
   import SidebarPOL from '@/components/SidebarPOL.vue';
   import MapBaseLayer from '@/components/MapBaseLayer.vue';
-  import ChartBarGauge from '@/components/ChartBarGauge.vue'
+  // import ChartBarGauge from '@/components/ChartBarGauge.vue'
 
   // URL connection
   const API_BASE = process.env.VUE_APP_API_BASE
@@ -357,7 +357,7 @@
       ForecastTable,
       SidebarPOL,
       MapBaseLayer,
-      ChartBarGauge,
+      // ChartBarGauge,
     },
     props: {
       baseLayer: {

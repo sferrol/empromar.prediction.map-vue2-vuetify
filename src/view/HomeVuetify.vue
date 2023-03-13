@@ -210,7 +210,7 @@
 
   // Components
   import ForecastLeyend from '../components/ForecastLeyend.vue'; // Import Map Component
-  import ForecastPlay from '../components/ForecastPlay.vue'; // Import Map Component
+  // import ForecastPlay from '../components/ForecastPlay.vue'; // Import Map Component
 
   export default {
     // Name of component
@@ -220,7 +220,7 @@
     components: {
       MapComponent,
       ForecastLeyend,
-      ForecastPlay,
+      // ForecastPlay,
     },
 
     setup() {
