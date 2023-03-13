@@ -730,7 +730,7 @@
       // eslint-disable-next-line no-unused-vars
       const leatletVelocity = () => {
 
-        debugger
+        // debugger
         var testLayer = L.velocityLayer({
           displayValues: true,
           displayOptions: {

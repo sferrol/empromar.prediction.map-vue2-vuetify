@@ -182,7 +182,7 @@ export default function useTimeMap() {
 
   // Añadir la capa (Crearla si no existe + Añadirla al mapa)
   const addLayerVelocity = async (ts) => {
-    debugger
+    // debugger
     if (!velocityDataList.value[ts]) {
 
       const response = await fetchVelocityData(ts)
