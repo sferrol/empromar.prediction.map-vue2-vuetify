@@ -269,7 +269,7 @@
 </template>
 
 <script>
-  import { computed, h, onMounted, ref, watch } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import axios from 'axios';
 
   // Leaflet
@@ -560,7 +560,7 @@
 
       // debugger
       const forecastDefault = vectorLayerGeojsonPOL.value.find( (element) => element?.properties?.name === 'Ribeira B')
-      const chartRenderizado = h(ChartBarGauge, { forecast: forecastDefault })
+      // const chartRenderizado = h(ChartBarGauge, { forecast: forecastDefault })
       // eslint-disable-next-line no-unused-vars
       const onPointToLayerIcon = (feature, latlng) => {
         // if (chartBarGaugeRef.value && chartBarGaugeRef.value.children.length > 0) {
@@ -1034,7 +1034,7 @@
         chartBarGaugeRefRC,
         vectorLayerGeojsonPOLForecast,
         forecastDefault,
-        chartRenderizado,
+        // chartRenderizado,
 
         // Mapbox tools (Layer, Map zoom +/-)
         baseLayerLocal,
