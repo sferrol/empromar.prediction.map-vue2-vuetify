@@ -178,6 +178,10 @@ export default function useMap() {
       dateRef.value = format(addDays(parseISO(dateRef.value), 1), 'yyyy-MM-dd');
     }
   }
+  // const getDateForecastFormatter = (timestamp) => {
+  //   debugger
+  //   return dateRef.value ? format(fromUnixTime(timestamp), "EEE d", { locale: es }) : ''
+  // }
   /** */
 
   return {
@@ -204,7 +208,6 @@ export default function useMap() {
     dateRef,
     dateRefFormatted,
     setDatePrev,
-    setDateNext,
-
+    setDateNext
   };
 }

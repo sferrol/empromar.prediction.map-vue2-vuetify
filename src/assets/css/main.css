@@ -19,3 +19,7 @@
   .w-100 {
     width: 100% !important;
   }
+
+  .v-btn:not(.v-btn--text):not(.v-btn--outlined):hover:before {
+    opacity: 0!important;
+  }

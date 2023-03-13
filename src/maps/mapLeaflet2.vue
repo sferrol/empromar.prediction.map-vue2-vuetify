@@ -54,6 +54,25 @@
             <ChartBarGauge ref="chartBarGaugeRef" style="max-width: 32px;"></ChartBarGauge>
             <ChartBarGauge ref="chartBarGaugeRefRC" style="max-width: 32px;"></ChartBarGauge>
           </v-btn> -->
+
+          <v-btn
+            class="my-1"
+            x-small
+            fab
+            :color="isRainViewerActive ? 'primary' : 'secondary'"
+            @click="isRainViewerActive = !isRainViewerActive"
+          >
+            <v-icon color="white">mdi-weather-windy</v-icon>
+          </v-btn>
+          <v-btn
+            class="my-1"
+            x-small
+            fab
+            :color="isVelocityViewerActive ? 'primary' : 'secondary'"
+            @click="isVelocityViewerActive = !isVelocityViewerActive"
+          >
+            <v-icon color="white">mdi-ferry</v-icon>
+          </v-btn>
         </div>
       </div>
 
@@ -134,54 +153,67 @@
             <v-date-picker
               v-model="dateRef"
               scrollable
+              locale="ES-es"
+              show-week
               @input="$refs.dialog.save(dateRef)"
             />
           </v-dialog>
 
-          <!-- Play / Pause -->
-          <v-btn
-            :color="animationTimer ? 'secondary' : 'primary'"
-            x-small
-            depressed
-            fab
-            @click="startstop"
-          >
-            <v-icon>
-              {{ animationTimer ? 'mdi-pause' : 'mdi-play' }}
-            </v-icon>
-          </v-btn>
+          <div v-if="isRainViewerActive || isVelocityViewerActive" class="w-100 d-flex align-center">
 
-          <!-- Slider -->
-          <!-- :thumb-size="24" -->
-          <v-slider
-            class="mr-1"
-            dense
-            v-model="animationPosition"
-            :min="animationPositionMin"
-            :max="animationPositionMax"
-            thumb-label="always"
-            ticks="always"
-            tick-size="4"
-            hide-details="true"
-            @change="(event) => onChangeAnimationPositionSlider(event)"
-            @click="stop"
-            @start="stop"
-          >
-            <template v-slot:thumb-label="{ value }">
-              Day{{ value }}
-            </template>
-          </v-slider>
+            <!-- Play / Pause -->
+            <!-- :color="animationTimer ? 'secondary' : 'primary'" -->
+            <!-- color="#e5e5e5" -->
+            <v-btn
+              x-small
+              fab
+              @click="startstop"
+            >
+              <v-icon color="#9d0300" size="25">
+                {{ animationTimer ? 'mdi-pause' : 'mdi-play' }}
+              </v-icon>
+            </v-btn>
 
-          <!-- Velocity -->
-          <v-btn
-            class="mr-1"
-            color="secondary"
-            x-small
-            depressed
-            @click="onChangeAnimationVelocity"
-          >
-            {{ animationVelocity }}x
-          </v-btn>
+            <!-- Slider -->
+            <!-- :thumb-size="24" -->
+            <v-slider
+              class="mr-1"
+              v-model="animationPosition"
+              :input="animationPosition"
+              :min="animationPositionMin"
+              :max="animationPositionMax"
+              track-color="grey"
+              track-fill-color="primary"
+              thumb-label="always"
+              thumb-color="#d49500"
+              ticks="always"
+              tick-size="2"
+              tick-height="12"
+              :tick-labels="['','','L']"
+              dense
+              hide-details="true"
+              @change="(event) => onChangeAnimationPositionSlider(event)"
+              @click="stop"
+              @start="stop"
+            >
+              <template v-slot:thumb-label="{ value }">
+                <div class="timeline-slider-thumb">
+                  {{ getAnimationPositionDateFormatter(value) }}
+                </div>
+              </template>
+            </v-slider>
+
+            <!-- Velocity -->
+            <v-btn
+              class="mr-1"
+              color="secondary"
+              x-small
+              depressed
+              @click="onChangeAnimationVelocity"
+            >
+              {{ animationVelocity }}x
+            </v-btn>
+          </div>
         </div>
       </div>
 
@@ -285,6 +317,9 @@
   // import "leaflet-particles" // Like windy particles
   import "leaflet-particles/src/js/L.ParticlesLayer" // Like windy particles
 
+  // Import
+  import particles1 from '../geojson/particles/particles_2017-07-10T00.json'; // Import vectorLayerGeojsonPMI GeoJSON (LonLat)
+
   import "../plugins/leaflet/Velocity/leaflet-velocity.css"
   import "../plugins/leaflet/Velocity/leaflet-velocity.js"
   // import "../plugins/leaflet/Velocity/src/css/leaflet-velocity.css"
@@ -377,8 +412,10 @@
 
       /** TimeMap */
       const {
-        animationPosition, animationPositionMin, animationPositionMax, onChangeAnimationPositionSlider,
-        onAdd,
+        isRainViewerActive,
+        isVelocityViewerActive,
+        onAdd : onAddRainViewer,
+        animationPosition, animationPositionMin, animationPositionMax, onChangeAnimationPositionSlider, getAnimationPositionDateFormatter,
         startstop, animationTimer, stop,
         animationVelocity, onChangeAnimationVelocity,
       } = useTimeMap()
@@ -396,7 +433,8 @@
       const {
         dateRef,
         dateRefFormatted,
-        setLastDateRefUsed
+        setLastDateRefUsed,
+        getDateForecastFormatter,
       } = useMap()
 
       // Actualizar la predicción al cambiar el contexto
@@ -756,18 +794,32 @@
         // eslint-disable-next-line no-unused-vars
         const index = 0
 
+        debugger
+        console.log(particles1)
+        const part = particles1.map((element) =>
+        {
+          6,          // particle id
+          element[1], // lon
+          element[0]  // lat
+          0.5,        // depth (m)
+          element[2]  // age
+        })
+
         // { lat: 42.51994, lng: -8.93902 }
         const data = {
-          "2023-03-03T18:00:00.000Z": [
-            [
-              6,        // particle id
-              -8.93902, // lon
-              42.51994, // lat
-              0.5,      // depth (m)
-              1.0       // age
-            ],
-          ]
+          "2023-03-03T18:00:00.000Z":
+            part
+          // [
+          //   [
+          //     6,        // particle id
+          //     -8.93902, // lon
+          //     42.51994, // lat
+          //     0.5,      // depth (m)
+          //     1.0       // age
+          //   ],
+          // ]
         }
+
 
         // create a particle layer
         const mode = 'FINAL';
@@ -909,7 +961,7 @@
 
         // rainWieverControl()
         // rainWieverFija()
-        leafletParticle()
+        // leafletParticle()
         // leatletVelocity()
         leafletHeat()
         leafletHeatmap()
@@ -917,7 +969,7 @@
         // leafletTimeDimension()
 
         // debugger
-        onAdd(map.value.mapObject)
+        onAddRainViewer(map.value.mapObject)
       }
 
       onMounted( () => {
@@ -1050,6 +1102,7 @@
         // DateRef
         dateRef,
         dateRefFormatted, // Computed DateRef with format
+        getDateForecastFormatter,
 
         // Map
         map,
@@ -1082,11 +1135,14 @@
         forecastMinimize,
 
         // TimeMap
+        isRainViewerActive,
+        isVelocityViewerActive,
         // Slider
         animationPosition,
         animationPositionMin,
         animationPositionMax,
         onChangeAnimationPositionSlider,
+        getAnimationPositionDateFormatter,
         // Start-Stop toggle
         startstop,
         stop,
@@ -1187,6 +1243,22 @@
     bottom: 0;
     left: 10px;
   }
+
+  /* Timeline */
+  .timeline-slider-thumb {
+    background-color: #d49500;
+    color: white;
+    height: 1.8em;
+    box-sizing: border-box;
+    padding: 0 0.8em;
+    white-space: nowrap;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    border-radius: 0.5em;
+    box-shadow: 0 0 4px 0 black;
+  }
+
 
   /* Forecast */
   .overlay-forecast-wrapper{
